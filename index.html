@@ -1,0 +1,200 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>501 Mining | Mine Manager</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+:root{--bg:#10151d;--panel:#1b2430;--gold:#e5ad32;--text:#f4f6fa;--muted:#aab4c2}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);font-family:Arial,sans-serif}
+header{padding:20px;background:#18212c;border-bottom:2px solid var(--gold)}
+h1{margin:0;font-size:24px}header p{margin:6px 0 0;color:var(--muted)}
+main{padding:16px;max-width:1100px;margin:auto}
+.panel,.metric{background:var(--panel);padding:16px;border-radius:12px;margin-bottom:14px}
+h2{font-size:18px;margin-top:0}
+input,button{width:100%;padding:13px;margin:6px 0;border-radius:8px;font-size:15px}
+input{background:#10151d;color:white;border:1px solid #465263}
+button{background:var(--gold);border:0;font-weight:bold;color:#151515}
+button.secondary{background:#354152;color:white}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px}
+.metric span{display:block;color:var(--muted);font-size:13px}
+.metric strong{display:block;font-size:25px;margin-top:9px;overflow-wrap:anywhere}
+nav{display:flex;gap:8px;overflow-x:auto;margin:12px 0}
+nav button{min-width:110px}
+pre{white-space:pre-wrap;overflow-wrap:anywhere;color:#dbe4f0;font-size:12px}
+.small{color:var(--muted);font-size:13px}
+.hidden{display:none!important}
+</style>
+</head>
+<body>
+<header>
+<h1>501 MINING</h1>
+<p>Mine Management System</p>
+</header>
+<main>
+<section id="login" class="panel">
+<h2>Manager sign in</h2>
+<p class="small">Sign in using your existing Supabase account.</p>
+<input id="email" type="email" placeholder="Email address" autocomplete="username">
+<input id="password" type="password" placeholder="Password" autocomplete="current-password">
+<button id="loginBtn">Sign in</button>
+<p id="loginMsg" class="small"></p>
+</section>
+
+<section id="app" class="hidden">
+<div class="panel">
+<strong id="welcome">Mine dashboard</strong>
+<p id="today" class="small"></p>
+<button id="refreshBtn">Refresh dashboard</button>
+<button id="logoutBtn" class="secondary">Sign out</button>
+</div>
+
+<div class="grid">
+<div class="metric"><span>Production entries</span><strong id="production">—</strong></div>
+<div class="metric"><span>Customer pickups</span><strong id="pickups">—</strong></div>
+<div class="metric"><span>Open breakdowns</span><strong id="breakdowns">—</strong></div>
+<div class="metric"><span>Pending approvals</span><strong id="approvals">—</strong></div>
+</div>
+
+<nav>
+<button data-table="stockpile_balances">Stockpiles</button>
+<button data-table="daily_machine_hours">Machine hours</button>
+<button data-table="machine_breakdowns">Breakdowns</button>
+<button data-table="job_cards">Job cards</button>
+<button data-table="diesel_logs">Diesel</button>
+<button data-table="maintenance_records">Maintenance</button>
+<button data-table="staff_duties">Staff duties</button>
+<button data-table="safety_inspections">Safety</button>
+<button data-table="approval_requests">Approvals</button>
+<button data-table="daily_whatsapp_report">Daily report</button>
+</nav>
+
+<section class="panel">
+<h2 id="sectionTitle">Dashboard information</h2>
+<p id="status" class="small">Choose a section or refresh the dashboard.</p>
+<pre id="results">Your mine records will appear here after sign-in.</pre>
+</section>
+</section>
+</main>
+<script>
+const SUPABASE_URL = "https://guintqihzpecbjvdgtdg.supabase.co";
+const SUPABASE_PUBLISHABLE_KEY = "sb_publishable_ts9yQRmjpbnmxFAtukasYQ_7nacpxta
+
+
+";
+const db = window.supabase.createClient(
+  SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY
+);
+
+const $ = id => document.getElementById(id);
+const tables = {
+  stockpile_balances:"Stockpile balances",
+  daily_machine_hours:"Daily machine hours",
+  machine_breakdowns:"Machine breakdowns",
+  job_cards:"Job cards",
+  diesel_logs:"Diesel logs",
+  maintenance_records:"Maintenance records",
+  staff_duties:"Staff duties",
+  safety_inspections:"Safety inspections",
+  approval_requests:"Approval requests",
+  daily_whatsapp_report:"Daily WhatsApp report"
+};
+
+function message(id, text) { $(id).textContent = text; }
+
+async function showSession(session) {
+  $("login").classList.toggle("hidden", !!session);
+  $("app").classList.toggle("hidden", !session);
+  if (session) {
+    message("welcome", "Signed in: " + session.user.email);
+    message("today", "South Africa time: " +
+      new Date().toLocaleString("en-ZA",{timeZone:"Africa/Johannesburg"}));
+    await refreshDashboard();
+  }
+}
+
+async function refreshDashboard() {
+  message("status","Loading mine data...");
+  const checks = [
+    ["production_entries","production"],
+    ["client_pickups","pickups"],
+    ["machine_breakdowns","breakdowns"],
+    ["approval_requests","approvals"]
+  ];
+  for (const [table,id] of checks) {
+    const {data,error} = await db.from(table).select("*").limit(500);
+    if (error) {
+      message(id,"Error");
+    } else if (id === "breakdowns") {
+      $(id).textContent = data.filter(r =>
+        !["resolved","closed","completed"].includes(
+          String(r.status || "").toLowerCase()
+        )).length;
+    } else if (id === "approvals") {
+      $(id).textContent = data.filter(r =>
+        String(r.status || "").toLowerCase() === "pending"
+      ).length;
+    } else {
+      $(id).textContent = data.length;
+    }
+  }
+  message("status","Dashboard counts loaded. Select a section below.");
+}
+
+async function loadTable(table) {
+  message("sectionTitle",tables[table] || table);
+  message("status","Loading records...");
+  message("results","");
+  const {data,error} = await db.from(table).select("*").limit(100);
+  if (error) {
+    message("status","Could not load this section.");
+    message("results",error.message);
+    return;
+  }
+  message("status",data.length + " record(s) returned. Maximum 100 shown.");
+  message("results",JSON.stringify(data,null,2));
+}
+
+$("loginBtn").onclick = async () => {
+  message("loginMsg","Signing in...");
+  const {data,error} = await db.auth.signInWithPassword({
+    email:$("email").value.trim(),
+    password:$("password").value
+  });
+  if (error) {
+    message("loginMsg",error.message);
+  } else {
+    message("loginMsg","");
+    await showSession(data.session);
+  }
+};
+
+$("logoutBtn").onclick = async () => {
+  const {error} = await db.auth.signOut();
+  if (error) message("status",error.message);
+  else await showSession(null);
+};
+
+$("refreshBtn").onclick = refreshDashboard;
+document.querySelectorAll("nav button").forEach(button => {
+  button.onclick = () => loadTable(button.dataset.table);
+});
+
+db.auth.onAuthStateChange((event,session) => {
+  if (event === "SIGNED_OUT") showSession(null);
+});
+
+(async () => {
+  if (SUPABASE_PUBLISHABLE_KEY.includes("PASTE_YOUR")) {
+    message("loginMsg","Setup needed: add your Supabase publishable key to index.html.");
+    return;
+  }
+  const {data} = await db.auth.getSession();
+  await showSession(data.session);
+})();
+</script>
+</body>
+</html>
