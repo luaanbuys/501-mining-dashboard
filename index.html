@@ -16,62 +16,30 @@
   --blue:#2878f0;
   --border:#344255;
   --green:#26b879;
-  --red:#e45454;
-  --orange:#f0a43a;
 }
 *{box-sizing:border-box}
-body{
-  margin:0;background:var(--bg);color:var(--text);
-  font-family:Arial,Helvetica,sans-serif;
-}
-header{
-  padding:18px 16px;background:#0b1017;
-  border-bottom:2px solid var(--blue);
-  position:sticky;top:0;z-index:5;
-}
-.brand{font-size:21px;font-weight:800;letter-spacing:.5px}
+body{margin:0;background:var(--bg);color:var(--text);font-family:Arial,Helvetica,sans-serif}
+header{padding:18px 16px;background:#0b1017;border-bottom:2px solid var(--blue);position:sticky;top:0;z-index:5}
+.brand{font-size:21px;font-weight:800}
 .brand span{color:#4590ff}
-.subtitle{font-size:12px;color:var(--muted);margin-top:5px}
+.subtitle,.muted{font-size:13px;color:var(--muted)}
+.subtitle{margin-top:5px}
 main{max-width:1150px;margin:auto;padding:16px}
-h1{font-size:25px;margin:8px 0}
+h1{font-size:25px}
 h2{font-size:21px;margin:8px 0 16px}
 h3{font-size:16px;margin:0 0 12px}
-p{line-height:1.5}
-.muted{color:var(--muted);font-size:13px}
-.panel{
-  background:var(--panel);border:1px solid var(--border);
-  border-radius:13px;padding:16px;margin-bottom:15px;
-}
-.grid{
-  display:grid;grid-template-columns:repeat(auto-fit,minmax(145px,1fr));
-  gap:12px;margin:16px 0;
-}
-.metric{
-  background:var(--panel);border:1px solid var(--border);
-  border-radius:12px;padding:16px;min-height:105px;
-}
+.panel,.metric{background:var(--panel);border:1px solid var(--border);border-radius:13px;padding:16px;margin-bottom:15px}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(145px,1fr));gap:12px;margin:16px 0}
+.metric{min-height:105px;margin:0}
 .metric-label{color:var(--muted);font-size:12px}
 .metric-value{font-size:27px;font-weight:800;margin-top:12px;overflow-wrap:anywhere}
-button,.button{
-  border:0;border-radius:8px;padding:11px 14px;
-  background:var(--blue);color:white;font-weight:700;
-  cursor:pointer;font-size:14px;
-}
-button:disabled{opacity:.55;cursor:wait}
+button{border:0;border-radius:8px;padding:11px 14px;background:var(--blue);color:white;font-weight:700;cursor:pointer;font-size:14px}
+button:disabled{opacity:.55}
 button.secondary{background:var(--panel2);border:1px solid var(--border)}
-button.danger{background:#a93636}
-button.green{background:#178858}
-nav{
-  display:flex;gap:8px;overflow-x:auto;padding:12px 0 15px;
-  scrollbar-width:thin;
-}
+nav{display:flex;gap:8px;overflow-x:auto;padding:12px 0 15px}
 nav button{white-space:nowrap;flex-shrink:0}
-nav button.active{background:#fff;color:#10151d}
-input,select,textarea{
-  width:100%;background:#0e141c;color:var(--text);
-  border:1px solid var(--border);border-radius:8px;
-  padding:11px;margin-top:6px;font-size:15px;
-}
+nav button.active{background:white;color:#10151d}
+input,select,textarea{width:100%;background:#0e141c;color:var(--text);border:1px solid var(--border);border-radius:8px;padding:11px;margin-top:6px;font-size:15px}
 textarea{min-height:90px;resize:vertical}
 label{display:block;font-size:13px;color:var(--muted);margin-bottom:12px}
 .form-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:4px 12px}
@@ -85,8 +53,6 @@ label{display:block;font-size:13px;color:var(--muted);margin-bottom:12px}
 .list{display:grid;gap:10px}
 .record{background:#111923;border:1px solid var(--border);border-radius:9px;padding:12px;overflow-wrap:anywhere}
 .record-title{font-weight:700;margin-bottom:6px}
-.record pre{white-space:pre-wrap;overflow-wrap:anywhere;font-size:12px;color:var(--muted)}
-hr{border:0;border-top:1px solid var(--border);margin:16px 0}
 footer{padding:22px;text-align:center;color:var(--muted);font-size:12px}
 </style>
 </head>
@@ -125,7 +91,7 @@ footer{padding:22px;text-align:center;color:var(--muted);font-size:12px}
     </div>
 
     <nav id="navigation">
-      <button class="active" data-page="home">Stockpile</button>
+      <button class="active" data-page="home">Stockpile Amount</button>
       <button data-page="production">Production</button>
       <button data-page="pickups">Client pickups</button>
       <button data-page="hours">Machine hours</button>
@@ -141,10 +107,11 @@ footer{padding:22px;text-align:center;color:var(--muted);font-size:12px}
 
     <section id="page-home" class="page">
       <h2>Stockpile Amount</h2>
-      <p class="muted">Current sand stock shown from your Supabase stockpile balances.</p>
+      <p class="muted">Live balance from your Supabase stockpile_balances view.</p>
+
       <div class="grid">
         <div class="metric">
-          <div class="metric-label">Stockpile Amount</div>
+          <div class="metric-label">Total sand stock</div>
           <div id="stockAmount" class="metric-value">Loading...</div>
         </div>
         <div class="metric">
@@ -164,14 +131,16 @@ footer{padding:22px;text-align:center;color:var(--muted);font-size:12px}
           <div id="approvalCount" class="metric-value">—</div>
         </div>
       </div>
+
       <div class="panel">
-        <h3>Stockpile balances</h3>
-        <div id="stockpileList" class="list">Loading stockpile data...</div>
+        <h3>Individual stockpiles</h3>
+        <div id="stockpileList" class="list">Loading stockpiles...</div>
         <div id="stockpileMessage" class="status hidden"></div>
       </div>
+
       <div class="panel">
-        <h3>Important</h3>
-        <p class="muted">Production entries and client pickups should update stock automatically through your existing Supabase triggers. This page displays the balance; it does not manually add or subtract stock.</p>
+        <h3>Automatic stock control</h3>
+        <p class="muted">Production increases the selected sand stockpile. Client pickups decrease the selected sand stockpile. These changes are handled by the existing database triggers.</p>
       </div>
     </section>
 
@@ -192,10 +161,8 @@ footer{padding:22px;text-align:center;color:var(--muted);font-size:12px}
 <footer>501 Mining · Mine Manager System</footer>
 
 <script>
-/* 501 MINING SUPABASE CONNECTION */
 const SUPABASE_URL = "https://guintqihzpecbjvdgtdg.supabase.co";
 const SUPABASE_KEY = "sb_publishable_ts9yQRmjpbnmxFAtukasYQ_7nacpxta";
-
 const db = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
 const definitions = {
@@ -203,24 +170,18 @@ const definitions = {
     table: "production_entries",
     title: "Production",
     fields: [
-      ["production_date","Production date","date"],
-      ["material","Sand type","text"],
-      ["quantity_m3","Quantity (m³)","number"],
-      ["machine","Machine","text"],
-      ["operator","Operator","text"],
-      ["notes","Notes","textarea"]
+      ["produced_at","Production date and time","datetime-local"],
+      ["material","Sand type","select",["Building Sand","Plaster Sand"]],
+      ["quantity_m3","Quantity (cubes)","number"]
     ]
   },
   pickups: {
     table: "client_pickups",
     title: "Client pickups",
     fields: [
-      ["pickup_date","Pickup date","date"],
-      ["client_name","Client name","text"],
-      ["material","Sand type","text"],
-      ["quantity_m3","Quantity (m³)","number"],
-      ["vehicle_registration","Vehicle registration","text"],
-      ["notes","Notes","textarea"]
+      ["collected_at","Pickup date and time","datetime-local"],
+      ["material","Sand type","select",["Building Sand","Plaster Sand"]],
+      ["quantity_m3","Quantity collected (cubes)","number"]
     ]
   },
   hours: {
@@ -339,9 +300,15 @@ const definitions = {
 };
 
 const $ = id => document.getElementById(id);
-const today = new Date().toISOString().slice(0,10);
+const today = () => new Date().toISOString().slice(0,10);
 
-function showMessage(target, message, type="info") {
+function localDateTime() {
+  const d = new Date();
+  d.setMinutes(d.getMinutes() - d.getTimezoneOffset());
+  return d.toISOString().slice(0,16);
+}
+
+function showMessage(target,message,type="info") {
   target.textContent = message;
   target.className = "status " + type;
   target.classList.remove("hidden");
@@ -351,51 +318,49 @@ function hideMessage(target) {
   target.classList.add("hidden");
 }
 function safeText(value) {
-  return String(value ?? "").replace(/[&<>"']/g, char => ({
+  return String(value ?? "").replace(/[&<>"']/g,c=>({
     "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"
-  })[char]);
-}
-function formatDate(value) {
-  if (!value) return "";
-  return String(value).slice(0,10);
+  })[c]);
 }
 function numberText(value) {
   const n = Number(value);
-  return Number.isFinite(n) ? n.toLocaleString("en-ZA",{maximumFractionDigits:2}) : "—";
-}
-function showGlobal(message, type="info") {
-  showMessage($("globalMessage"), message, type);
-}
-function clearGlobal() {
-  hideMessage($("globalMessage"));
+  return Number.isFinite(n)
+    ? n.toLocaleString("en-ZA",{maximumFractionDigits:2})
+    : "—";
 }
 
-function makeField(field, index, prefix) {
+function makeField(field,index,prefix) {
   const [name,label,type,options] = field;
   const id = prefix + "_" + index;
   let control = "";
+
   if (type === "textarea") {
     control = `<textarea id="${id}" name="${name}"></textarea>`;
   } else if (type === "select") {
-    control = `<select id="${id}" name="${name}">
-      <option value="">Select...</option>
-      ${options.map(option => `<option value="${safeText(option)}">${safeText(option)}</option>`).join("")}
+    control = `<select id="${id}" name="${name}" required>
+      <option value="">Choose an option</option>
+      ${options.map(o=>`<option value="${safeText(o)}">${safeText(o)}</option>`).join("")}
     </select>`;
   } else {
-    const value = type === "date" ? ` value="${today}"` : "";
-    const step = type === "number" ? ' step="any"' : "";
-    control = `<input id="${id}" name="${name}" type="${type}"${value}${step}>`;
+    const value = type === "date"
+      ? ` value="${today()}"`
+      : type === "datetime-local"
+        ? ` value="${localDateTime()}"`
+        : "";
+    const step = type === "number" ? ' step="any" min="0"' : "";
+    const required = ["date","datetime-local","number"].includes(type) ? " required" : "";
+    control = `<input id="${id}" name="${name}" type="${type}"${value}${step}${required}>`;
   }
+
   return `<label>${safeText(label)}${control}</label>`;
 }
 
-function buildSection(key, config) {
+function buildSection(key,config) {
   const root = $("page-" + key);
   root.innerHTML = `
     <h2>${safeText(config.title)}</h2>
     <div class="panel">
       <h3>Add new record</h3>
-      <p class="muted">Complete the fields and save the entry.</p>
       <form id="form-${key}">
         <div class="form-grid">
           ${config.fields.map((field,index)=>makeField(field,index,key)).join("")}
@@ -416,8 +381,14 @@ function buildSection(key, config) {
     </div>
   `;
 
-  $("form-" + key).addEventListener("submit", event => saveRecord(event,key,config));
-  $("reload-" + key).addEventListener("click", () => loadRecords(key,config));
+  $("form-" + key).addEventListener("submit",event=>saveRecord(event,key,config));
+  $("form-" + key).addEventListener("reset",()=>{
+    setTimeout(()=>{
+      root.querySelectorAll('input[type="date"]').forEach(el=>el.value=today());
+      root.querySelectorAll('input[type="datetime-local"]').forEach(el=>el.value=localDateTime());
+    },0);
+  });
+  $("reload-" + key).addEventListener("click",()=>loadRecords(key,config));
 }
 
 async function saveRecord(event,key,config) {
@@ -432,11 +403,28 @@ async function saveRecord(event,key,config) {
     if (!control) continue;
     const raw = control.value.trim();
     if (raw === "") continue;
-    payload[name] = type === "number" ? Number(raw) : raw;
+
+    if (type === "number") {
+      const n = Number(raw);
+      if (!Number.isFinite(n) || n < 0) {
+        showMessage(message,`Enter a valid quantity for ${label}.`,"warn");
+        return;
+      }
+      payload[name] = n;
+    } else if (type === "datetime-local") {
+      const date = new Date(raw);
+      if (Number.isNaN(date.getTime())) {
+        showMessage(message,`Please select a valid date and time for ${label}.`,"warn");
+        return;
+      }
+      payload[name] = date.toISOString();
+    } else {
+      payload[name] = raw;
+    }
   }
 
-  if (Object.keys(payload).length === 0) {
-    showMessage(message,"Please complete at least one field.","warn");
+  if (!Object.keys(payload).length) {
+    showMessage(message,"Please complete the form before saving.","warn");
     return;
   }
 
@@ -448,15 +436,15 @@ async function saveRecord(event,key,config) {
     const {error} = await db.from(config.table).insert(payload);
     if (error) throw error;
 
-    showMessage(message,"Record saved successfully.","ok");
+    showMessage(message,"Saved successfully.","ok");
     form.reset();
-    form.querySelectorAll('input[type="date"]').forEach(input => input.value = today);
     await loadRecords(key,config);
     await refreshDashboard();
   } catch (error) {
     showMessage(message,
-      "Could not save this record.\n" + (error.message || String(error)) +
-      "\n\nCheck that the field names in this form match your Supabase table columns and that your table permissions allow inserts.",
+      "Could not save to " + config.table + ".\n" +
+      (error.message || String(error)) +
+      "\n\nThe database column names or permissions may not match this form.",
       "error");
   } finally {
     button.disabled = false;
@@ -467,25 +455,29 @@ async function saveRecord(event,key,config) {
 async function loadRecords(key,config) {
   const container = $("records-" + key);
   container.textContent = "Loading records...";
+
   try {
     const {data,error} = await db.from(config.table).select("*").limit(20);
     if (error) throw error;
+
     if (!data || data.length === 0) {
       container.innerHTML = '<div class="muted">No records found yet.</div>';
       return;
     }
-    container.innerHTML = data.map((row,index) => {
+
+    container.innerHTML = data.map((row,index)=>{
       const entries = Object.entries(row)
-        .filter(([name]) => !["id"].includes(name))
-        .slice(0,8)
-        .map(([name,value]) => `<div><span class="muted">${safeText(name.replaceAll("_"," "))}:</span> ${safeText(value)}</div>`)
-        .join("");
+        .filter(([name])=>name !== "id")
+        .slice(0,10)
+        .map(([name,value])=>
+          `<div><span class="muted">${safeText(name.replaceAll("_"," "))}:</span> ${safeText(value)}</div>`
+        ).join("");
       return `<div class="record"><div class="record-title">Record ${index+1}</div>${entries}</div>`;
     }).join("");
   } catch (error) {
     container.innerHTML = "";
     showMessage($("message-" + key),
-      "Could not load records from " + config.table + ".\n" +
+      "Could not load " + config.table + ".\n" +
       (error.message || String(error)),"error");
   }
 }
@@ -494,8 +486,9 @@ async function loadStockpile() {
   const amount = $("stockAmount");
   const list = $("stockpileList");
   const message = $("stockpileMessage");
+
   amount.textContent = "Loading...";
-  list.textContent = "Loading stockpile data...";
+  list.textContent = "Loading stockpiles...";
   hideMessage(message);
 
   try {
@@ -505,74 +498,71 @@ async function loadStockpile() {
       .limit(100);
 
     if (error) throw error;
+
     if (!data || data.length === 0) {
       amount.textContent = "0 cubes";
-      list.innerHTML = '<div class="muted">No stockpile balance rows found.</div>';
-      showMessage(message,"The table returned no rows. Check whether stockpile_balances contains your current stock.","warn");
+      list.innerHTML = '<div class="muted">No stockpile balances found.</div>';
       return;
     }
 
-    const quantityKeys = [
-      "current_stock_m3","balance_m3","quantity_m3",
-      "balance","quantity","current_stock","stock_quantity"
-    ];
-    const nameKeys = [
-      "material","sand_type","product","stockpile_name","name"
-    ];
-
     let total = 0;
-    let foundQuantity = false;
+    let totalFound = false;
 
-    const cards = data.map(row => {
-      const qtyKey = quantityKeys.find(key =>
-        row[key] !== undefined && row[key] !== null
-      );
-      const nameKey = nameKeys.find(key =>
-        row[key] !== undefined && row[key] !== null && row[key] !== ""
-      );
+    const cards = data.map(row=>{
+      const qtyKey = [
+        "current_stock_m3","balance_m3","quantity_m3",
+        "balance","quantity","current_stock","stock_quantity"
+      ].find(key=>row[key] !== undefined && row[key] !== null);
+
+      const nameKey = [
+        "material","sand_type","product","stockpile_name","name"
+      ].find(key=>row[key] !== undefined && row[key] !== null);
+
       const qty = qtyKey ? Number(row[qtyKey]) : NaN;
+      const name = nameKey ? row[nameKey] : "Sand stockpile";
+
       if (Number.isFinite(qty)) {
         total += qty;
-        foundQuantity = true;
+        totalFound = true;
       }
-      const label = nameKey ? row[nameKey] : "Sand stockpile";
-      const amountText = qtyKey && Number.isFinite(qty)
-        ? `${numberText(qty)} cubes`
-        : "Amount unavailable";
 
       return `<div class="record">
-        <div class="record-title">${safeText(label)}</div>
-        <div class="metric-value">${safeText(amountText)}</div>
+        <div class="record-title">${safeText(name)}</div>
+        <div class="metric-value">${
+          qtyKey && Number.isFinite(qty)
+            ? safeText(numberText(qty) + " cubes")
+            : "Amount unavailable"
+        }</div>
       </div>`;
     }).join("");
 
-    amount.textContent = foundQuantity ? `${numberText(total)} cubes` : "Unavailable";
+    amount.textContent = totalFound ? numberText(total) + " cubes" : "Unavailable";
     list.innerHTML = cards;
 
-    if (!foundQuantity) {
+    if (!totalFound) {
       showMessage(message,
-        "The stockpile rows loaded, but no recognised quantity column was found. Check the table columns in Supabase.",
+        "Stockpile rows loaded, but the quantity column was not recognised.",
         "warn");
     }
   } catch (error) {
     amount.textContent = "Unavailable";
     list.innerHTML = "";
     showMessage(message,
-      "Could not load stockpile_balances.\n" +
-      (error.message || String(error)) +
-      "\n\nCheck your Supabase table permissions and column names.",
+      "Could not load stockpile balances.\n" +
+      (error.message || String(error)),
       "error");
   }
 }
 
-async function countRows(table, elementId, filterFn) {
+async function countRows(table,elementId,filterFn) {
   try {
     const {data,error} = await db.from(table).select("*").limit(500);
     if (error) throw error;
     const rows = data || [];
-    const count = filterFn ? rows.filter(filterFn).length : rows.length;
-    $(elementId).textContent = String(count);
-  } catch (error) {
+    $(elementId).textContent = String(
+      filterFn ? rows.filter(filterFn).length : rows.length
+    );
+  } catch {
     $(elementId).textContent = "—";
   }
 }
@@ -582,49 +572,52 @@ async function refreshDashboard() {
   await Promise.all([
     countRows("production_entries","productionCount"),
     countRows("client_pickups","pickupCount"),
-    countRows("machine_breakdowns","breakdownCount",row => {
-      const status = String(row.status || "").toLowerCase();
-      return status !== "completed" && status !== "closed" && status !== "resolved";
+    countRows("machine_breakdowns","breakdownCount",row=>{
+      const s = String(row.status || "").toLowerCase();
+      return !["completed","closed","resolved"].includes(s);
     }),
-    countRows("approval_requests","approvalCount",row =>
+    countRows("approval_requests","approvalCount",row=>
       String(row.status || "pending").toLowerCase() === "pending"
     )
   ]);
 }
 
 function showPage(key) {
-  document.querySelectorAll(".page").forEach(page => page.classList.add("hidden"));
+  document.querySelectorAll(".page").forEach(p=>p.classList.add("hidden"));
   $("page-" + key).classList.remove("hidden");
-  document.querySelectorAll("#navigation button").forEach(button => {
-    button.classList.toggle("active",button.dataset.page === key);
+
+  document.querySelectorAll("#navigation button").forEach(button=>{
+    button.classList.toggle("active",button.dataset.page===key);
   });
+
   if (key === "home") refreshDashboard();
   if (definitions[key]) loadRecords(key,definitions[key]);
 }
 
-Object.entries(definitions).forEach(([key,config]) => buildSection(key,config));
+Object.entries(definitions).forEach(([key,config])=>buildSection(key,config));
 
-document.querySelectorAll("#navigation button").forEach(button => {
-  button.addEventListener("click",() => showPage(button.dataset.page));
+document.querySelectorAll("#navigation button").forEach(button=>{
+  button.addEventListener("click",()=>showPage(button.dataset.page));
 });
 
 async function showApp(session) {
   $("loginPanel").classList.add("hidden");
   $("appPanel").classList.remove("hidden");
   $("userEmail").textContent = session.user.email || "Signed in";
-  clearGlobal();
+  hideMessage($("globalMessage"));
   await refreshDashboard();
 }
 
-async function showLogin() {
+function showLogin() {
   $("appPanel").classList.add("hidden");
   $("loginPanel").classList.remove("hidden");
 }
 
-$("loginForm").addEventListener("submit",async event => {
+$("loginForm").addEventListener("submit",async event=>{
   event.preventDefault();
   const button = $("loginButton");
   const message = $("loginMessage");
+
   button.disabled = true;
   button.textContent = "Signing in...";
   hideMessage(message);
@@ -638,8 +631,7 @@ $("loginForm").addEventListener("submit",async event => {
     await showApp(data.session);
   } catch (error) {
     showMessage(message,
-      "Login failed: " + (error.message || String(error)) +
-      "\nMake sure you are using your existing Supabase login.",
+      "Login failed: " + (error.message || String(error)),
       "error");
   } finally {
     button.disabled = false;
@@ -647,18 +639,19 @@ $("loginForm").addEventListener("submit",async event => {
   }
 });
 
-$("logoutButton").addEventListener("click",async () => {
-  await db.auth.signOut();
-  await showLogin();
+$("logoutButton").addEventListener("click",async()=>{
+  const {error} = await db.auth.signOut();
+  if (error) showGlobal(error.message,"error");
+  else showLogin();
 });
 
-$("refreshButton").addEventListener("click",async () => {
+$("refreshButton").addEventListener("click",async()=>{
   showGlobal("Refreshing dashboard...","info");
   await refreshDashboard();
-  showGlobal("Refresh finished. Check any warnings shown on the page.","ok");
+  showGlobal("Refresh completed. Check for any warnings on the page.","ok");
 });
 
-db.auth.onAuthStateChange((event,session) => {
+db.auth.onAuthStateChange((event,session)=>{
   if (session) {
     showApp(session);
   } else {
@@ -666,12 +659,12 @@ db.auth.onAuthStateChange((event,session) => {
   }
 });
 
-(async function startApp() {
+(async function startApp(){
   try {
     const {data,error} = await db.auth.getSession();
     if (error) throw error;
     if (data.session) await showApp(data.session);
-    else await showLogin();
+    else showLogin();
   } catch (error) {
     showMessage($("loginMessage"),
       "Could not connect to Supabase.\n" +
