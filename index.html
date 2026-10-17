@@ -3,48 +3,149 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="theme-color" content="#10151d">
 <title>501 Mining | Mine Manager</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
 <style>
-:root{--bg:#10151d;--panel:#192230;--panel2:#202c3b;--text:#f4f7fb;--muted:#aab6c6;--blue:#2878f0;--border:#344255;--green:#26b879}
-*{box-sizing:border-box}
-body{margin:0;background:var(--bg);color:var(--text);font-family:Arial,Helvetica,sans-serif}
-header{padding:17px;background:#0b1017;border-bottom:2px solid var(--blue);position:sticky;top:0;z-index:5}
-.brand{font-size:23px;font-weight:800}.brand span{color:#4590ff}
-.subtitle,.muted{color:var(--muted);font-size:13px}
-.subtitle{margin-top:5px}
-main{max-width:1200px;margin:auto;padding:15px}
-h2{font-size:21px;margin:8px 0 15px}h3{font-size:16px;margin:0 0 12px}
-.panel,.metric{background:var(--panel);border:1px solid var(--border);border-radius:12px;padding:15px;margin-bottom:14px}
-.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(145px,1fr));gap:12px;margin:14px 0}
-.metric{margin:0;min-height:105px}
-.metric-label{font-size:12px;color:var(--muted);letter-spacing:.3px}
-.metric-value{font-size:25px;font-weight:800;margin-top:12px;overflow-wrap:anywhere}
-.stock-value{color:#76b1ff}.production-value{color:#5ee0a4}
-nav{display:flex;gap:8px;overflow-x:auto;padding:12px 0 15px}
-nav button{white-space:nowrap;flex-shrink:0}
-button{border:0;border-radius:8px;padding:11px 14px;background:var(--blue);color:white;font-weight:700;cursor:pointer;font-size:14px}
-button:disabled{opacity:.55}
-button.secondary{background:var(--panel2);border:1px solid var(--border)}
-nav button.active{background:white;color:#10151d}
-input,select,textarea{width:100%;background:#0e141c;color:var(--text);border:1px solid var(--border);border-radius:8px;padding:11px;margin-top:6px;font-size:15px}
-textarea{min-height:80px;resize:vertical}
-label{display:block;font-size:13px;color:var(--muted);margin-bottom:12px}
-.form-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:4px 12px}
-.actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
-.status{padding:11px;border-radius:8px;margin:10px 0;white-space:pre-wrap;overflow-wrap:anywhere}
-.info{background:#1d3550}.ok{background:#123d2e}.error{background:#4b2024}.warn{background:#4a351c}
-.hidden{display:none!important}
-.list{display:grid;gap:10px}
-.record{background:#111923;border:1px solid var(--border);border-radius:9px;padding:12px;overflow-wrap:anywhere}
-.record-title{font-weight:700;margin-bottom:8px}
-.required{color:#ffb36b}
-.small-button{padding:7px 10px;font-size:12px}
-footer{text-align:center;padding:22px;color:var(--muted);font-size:12px}
+:root {
+  --bg:#10151d;
+  --panel:#192230;
+  --panel2:#202c3b;
+  --text:#f4f7fb;
+  --muted:#aab6c6;
+  --blue:#2878f0;
+  --border:#344255;
+  --green:#26b879;
+}
+* { box-sizing:border-box; }
+body {
+  margin:0;
+  background:var(--bg);
+  color:var(--text);
+  font-family:Arial,Helvetica,sans-serif;
+}
+header {
+  padding:17px;
+  background:#0b1017;
+  border-bottom:2px solid var(--blue);
+  position:sticky;
+  top:0;
+  z-index:5;
+}
+.brand { font-size:23px;font-weight:800; }
+.brand span { color:#4590ff; }
+.subtitle,.muted { color:var(--muted);font-size:13px; }
+.subtitle { margin-top:5px; }
+main { max-width:1200px;margin:auto;padding:15px; }
+h2 { font-size:21px;margin:8px 0 15px; }
+h3 { font-size:16px;margin:0 0 12px; }
+.panel,.metric {
+  background:var(--panel);
+  border:1px solid var(--border);
+  border-radius:12px;
+  padding:15px;
+  margin-bottom:14px;
+}
+.grid {
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(145px,1fr));
+  gap:12px;
+  margin:14px 0;
+}
+.metric { margin:0;min-height:105px; }
+.metric-label { font-size:12px;color:var(--muted);letter-spacing:.3px; }
+.metric-value {
+  font-size:25px;
+  font-weight:800;
+  margin-top:12px;
+  overflow-wrap:anywhere;
+}
+.stock-value { color:#76b1ff; }
+.production-value { color:#5ee0a4; }
+nav {
+  display:flex;
+  gap:8px;
+  overflow-x:auto;
+  padding:12px 0 15px;
+}
+nav button { white-space:nowrap;flex-shrink:0; }
+button {
+  border:0;
+  border-radius:8px;
+  padding:11px 14px;
+  background:var(--blue);
+  color:white;
+  font-weight:700;
+  cursor:pointer;
+  font-size:14px;
+}
+button:disabled { opacity:.55; }
+button.secondary {
+  background:var(--panel2);
+  border:1px solid var(--border);
+}
+nav button.active { background:white;color:#10151d; }
+input,select,textarea {
+  width:100%;
+  background:#0e141c;
+  color:var(--text);
+  border:1px solid var(--border);
+  border-radius:8px;
+  padding:11px;
+  margin-top:6px;
+  font-size:15px;
+}
+textarea { min-height:80px;resize:vertical; }
+label {
+  display:block;
+  font-size:13px;
+  color:var(--muted);
+  margin-bottom:12px;
+}
+.form-grid {
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(210px,1fr));
+  gap:4px 12px;
+}
+.actions {
+  display:flex;
+  gap:8px;
+  flex-wrap:wrap;
+  margin-top:8px;
+}
+.status {
+  padding:11px;
+  border-radius:8px;
+  margin:10px 0;
+  white-space:pre-wrap;
+  overflow-wrap:anywhere;
+}
+.info { background:#1d3550; }
+.ok { background:#123d2e; }
+.error { background:#4b2024; }
+.warn { background:#4a351c; }
+.hidden { display:none!important; }
+.list { display:grid;gap:10px; }
+.record {
+  background:#111923;
+  border:1px solid var(--border);
+  border-radius:9px;
+  padding:12px;
+  overflow-wrap:anywhere;
+}
+.record-title { font-weight:700;margin-bottom:8px; }
+.required { color:#ffb36b; }
+footer {
+  text-align:center;
+  padding:22px;
+  color:var(--muted);
+  font-size:12px;
+}
 </style>
 </head>
+
 <body>
 <header>
   <div class="brand">501 <span>MINING</span></div>
@@ -88,7 +189,7 @@ footer{text-align:center;padding:22px;color:var(--muted);font-size:12px}
     <button data-page="diesel">Diesel</button>
     <button data-page="maintenance">Maintenance</button>
     <button data-page="duties">Staff duties</button>
-    <button data-page="safety">Safety</button>
+    <button data-page="safety">DMRE Inspection</button>
     <button data-page="approvals">Approvals</button>
     <button data-page="reports">Daily reports</button>
   </nav>
@@ -173,15 +274,12 @@ footer{text-align:center;padding:22px;color:var(--muted);font-size:12px}
 <footer>501 Mining · Mine Manager System</footer>
 
 <script>
+"use strict";
+
 const SUPABASE_URL = "https://guintqihzpecbjvdgtdg.supabase.co";
 const SUPABASE_KEY = "sb_publishable_ts9yQRmjpbnmxFAtukasYQ_7nacpxta";
 const db = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-/*
-  These are the known machines/equipment from the mine details.
-  Change these labels if your official fleet names differ.
-  Values are machine names, not invented database UUIDs.
-*/
 const machines = [
   "Caterpillar 416D TLB",
   "Mercedes-Benz Axor 3335 Truck",
@@ -191,19 +289,20 @@ const machines = [
 
 const definitions = {
   production: {
-    table: "production_entries",
-    title: "Production",
-    fields: [
+    table:"production_entries",
+    title:"Production",
+    fields:[
       ["produced_at","Production date and time","datetime-local",true],
       ["material","Sand type","select",true,["Building Sand","Plaster Sand"]],
       ["quantity_m3","Quantity produced (cubes)","number",true],
       ["notes","Notes","textarea"]
     ]
   },
+
   pickups: {
-    table: "client_pickups",
-    title: "Client pickups",
-    fields: [
+    table:"client_pickups",
+    title:"Client pickups",
+    fields:[
       ["collected_at","Pickup date and time","datetime-local",true],
       ["client_name","Client name","text",true],
       ["material","Sand type","select",true,["Building Sand","Plaster Sand"]],
@@ -213,10 +312,11 @@ const definitions = {
       ["notes","Notes","textarea"]
     ]
   },
+
   hours: {
-    table: "daily_machine_hours",
-    title: "Machine hours",
-    fields: [
+    table:"daily_machine_hours",
+    title:"Machine hours",
+    fields:[
       ["work_date","Work date","date",true],
       ["machine_name","Machine","machine",true],
       ["start_hours","Starting hours","number",true],
@@ -226,10 +326,11 @@ const definitions = {
       ["notes","Notes","textarea"]
     ]
   },
+
   breakdowns: {
-    table: "machine_breakdowns",
-    title: "Breakdowns",
-    fields: [
+    table:"machine_breakdowns",
+    title:"Breakdowns",
+    fields:[
       ["breakdown_date","Breakdown date","date",true],
       ["machine_name","Machine","machine",true],
       ["problem","Problem / fault","textarea",true],
@@ -239,10 +340,11 @@ const definitions = {
       ["notes","Notes","textarea"]
     ]
   },
+
   jobs: {
-    table: "job_cards",
-    title: "Job cards",
-    fields: [
+    table:"job_cards",
+    title:"Job cards",
+    fields:[
       ["job_date","Job date","date",true],
       ["machine_name","Machine","machine",true],
       ["job_description","Job description","textarea",true],
@@ -253,10 +355,11 @@ const definitions = {
       ["notes","Notes","textarea"]
     ]
   },
+
   diesel: {
-    table: "diesel_logs",
-    title: "Diesel",
-    fields: [
+    table:"diesel_logs",
+    title:"Diesel",
+    fields:[
       ["log_date","Date","date",true],
       ["machine_name","Machine / vehicle","machine",true],
       ["litres","Litres issued","number",true],
@@ -265,10 +368,11 @@ const definitions = {
       ["notes","Notes","textarea"]
     ]
   },
+
   maintenance: {
-    table: "maintenance_records",
-    title: "Maintenance",
-    fields: [
+    table:"maintenance_records",
+    title:"Maintenance",
+    fields:[
       ["maintenance_date","Maintenance date","date",true],
       ["machine_name","Machine","machine",true],
       ["maintenance_type","Maintenance type","text",true],
@@ -278,10 +382,11 @@ const definitions = {
       ["notes","Notes","textarea"]
     ]
   },
+
   duties: {
-    table: "staff_duties",
-    title: "Staff duties",
-    fields: [
+    table:"staff_duties",
+    title:"Staff duties",
+    fields:[
       ["duty_date","Date","date",true],
       ["staff_name","Staff member","text",true],
       ["duty","Duty / task","textarea",true],
@@ -289,23 +394,30 @@ const definitions = {
       ["notes","Notes","textarea"]
     ]
   },
+
   safety: {
-    table: "safety_inspections",
-    title: "Safety inspections",
-    fields: [
+    table:"safety_inspections",
+    title:"DMRE Inspection",
+    fields:[
       ["inspection_date","Inspection date","date",true],
-      ["area_or_machine","Area / machine","text",true],
-      ["inspector","Inspector","text",true],
-      ["findings","Findings","textarea",true],
-      ["corrective_action","Corrective action","textarea"],
-      ["status","Status","select",true,["Pass","Action required","Completed"]],
-      ["notes","Notes","textarea"]
+      ["area_or_machine","Inspection area / machine","text",true],
+      ["inspector","Inspector / competent person","text",true],
+      ["findings","Inspection findings","textarea",true],
+      ["corrective_action","Required corrective action","textarea",true],
+      ["status","Compliance status","select",true,[
+        "Compliant",
+        "Non-compliant",
+        "Action required",
+        "Completed"
+      ]],
+      ["notes","Additional notes","textarea"]
     ]
   },
+
   approvals: {
-    table: "approval_requests",
-    title: "Approval requests",
-    fields: [
+    table:"approval_requests",
+    title:"Approval requests",
+    fields:[
       ["request_date","Request date","date",true],
       ["requested_by","Requested by","text",true],
       ["request_type","Request type","text",true],
@@ -316,10 +428,11 @@ const definitions = {
       ["review_notes","Review notes","textarea"]
     ]
   },
+
   reports: {
-    table: "daily_whatsapp_report",
-    title: "Daily WhatsApp reports",
-    fields: [
+    table:"daily_whatsapp_report",
+    title:"Daily WhatsApp reports",
+    fields:[
       ["report_date","Report date","date",true],
       ["report_text","Report text","textarea",true],
       ["status","Status","select",true,["Draft","Ready to send","Sent"]],
@@ -343,13 +456,17 @@ function localDateTime() {
 }
 
 function esc(value) {
-  return String(value ?? "").replace(/[&<>"']/g, c => ({
-    "&":"&amp;", "<":"&lt;", ">":"&gt;", '"':"&quot;", "'":"&#39;"
+  return String(value ?? "").replace(/[&<>"']/g,c => ({
+    "&":"&amp;",
+    "<":"&lt;",
+    ">":"&gt;",
+    '"':"&quot;",
+    "'":"&#39;"
   })[c]);
 }
 
 function fmt(value) {
-  return Number(value).toLocaleString("en-ZA", {
+  return Number(value).toLocaleString("en-ZA",{
     maximumFractionDigits:2
   });
 }
@@ -395,6 +512,7 @@ function makeField(field,index,key) {
 
 function buildSection(key,config) {
   const root = $("page-" + key);
+
   root.innerHTML = `
     <h2>${esc(config.title)}</h2>
     <div class="panel">
@@ -419,17 +537,20 @@ function buildSection(key,config) {
     </div>`;
 
   $("form-" + key).addEventListener("submit",e => saveRecord(e,key,config));
+
   $("form-" + key).addEventListener("reset",() => {
     setTimeout(() => {
       root.querySelectorAll('input[type="date"]').forEach(el => el.value = localDate());
       root.querySelectorAll('input[type="datetime-local"]').forEach(el => el.value = localDateTime());
     },0);
   });
+
   $("reload-" + key).addEventListener("click",() => loadRecords(key,config));
 }
 
 async function saveRecord(event,key,config) {
   event.preventDefault();
+
   const form = event.currentTarget;
   const message = $("message-" + key);
   const button = form.querySelector('button[type="submit"]');
@@ -438,6 +559,7 @@ async function saveRecord(event,key,config) {
   for (const [name,label,type,required] of config.fields) {
     const control = form.elements.namedItem(name);
     if (!control) continue;
+
     const raw = control.value.trim();
 
     if (required && !raw) {
@@ -445,6 +567,7 @@ async function saveRecord(event,key,config) {
       control.focus();
       return;
     }
+
     if (!raw) continue;
 
     if (type === "number") {
@@ -477,8 +600,6 @@ async function saveRecord(event,key,config) {
 
     const user = authData?.user;
 
-    // UUID columns must receive the authenticated user's UUID, not email.
-    // Do not send entered_by until the signed-in user is available.
     if (user && ["production_entries","client_pickups"].includes(config.table)) {
       payload.entered_by = user.id;
     }
@@ -490,6 +611,7 @@ async function saveRecord(event,key,config) {
     form.reset();
     await loadRecords(key,config);
     await refreshDashboard();
+
   } catch (error) {
     showMessage(message,
       "Could not save to " + config.table + ".\n" +
@@ -532,6 +654,7 @@ async function loadRecords(key,config) {
         ${details}
       </div>`;
     }).join("");
+
   } catch (error) {
     container.innerHTML = "";
     showMessage($("message-" + key),
@@ -557,7 +680,6 @@ function stockQuantity(row) {
 async function loadStockpile() {
   const list = $("stockpileList");
   const message = $("stockpileMessage");
-
   hideMessage(message);
 
   try {
@@ -593,6 +715,7 @@ async function loadStockpile() {
     list.innerHTML = rows.map(row => {
       const name = materialName(row) || "Sand stockpile";
       const quantity = stockQuantity(row);
+
       return `<div class="record">
         <div class="record-title">${esc(name)}</div>
         <div class="metric-value">${Number.isFinite(quantity) ? esc(fmt(quantity)) + " m³" : "Quantity unavailable"}</div>
@@ -604,6 +727,7 @@ async function loadStockpile() {
         "At least one sand stockpile was not matched. Check the material names and quantity column in stockpile_balances.",
         "warn");
     }
+
   } catch (error) {
     $("buildingStock").textContent = "Unavailable";
     $("plasterStock").textContent = "Unavailable";
@@ -640,7 +764,6 @@ async function loadDailyProduction() {
       const quantity = Number(row.quantity_m3);
 
       if (!Number.isFinite(quantity)) continue;
-
       if (material.includes("building")) building += quantity;
       if (material.includes("plaster")) plaster += quantity;
     }
@@ -648,6 +771,7 @@ async function loadDailyProduction() {
     $("buildingProduced").textContent = fmt(building) + " m³";
     $("plasterProduced").textContent = fmt(plaster) + " m³";
     $("totalProduced").textContent = fmt(building + plaster) + " m³";
+
   } catch (error) {
     $("buildingProduced").textContent = "Unavailable";
     $("plasterProduced").textContent = "Unavailable";
@@ -714,6 +838,7 @@ function showLogin() {
 
 async function showApp(session) {
   if (!session) return;
+
   $("loginPanel").classList.add("hidden");
   $("appPanel").classList.remove("hidden");
   $("userEmail").textContent = session.user.email || "Signed in";
@@ -723,6 +848,7 @@ async function showApp(session) {
 
 $("loginForm").addEventListener("submit",async event => {
   event.preventDefault();
+
   const button = $("loginButton");
   const message = $("loginMessage");
 
@@ -735,8 +861,10 @@ $("loginForm").addEventListener("submit",async event => {
       email:$("email").value.trim(),
       password:$("password").value
     });
+
     if (error) throw error;
     await showApp(data.session);
+
   } catch (error) {
     showMessage(message,"Login failed: " + (error.message || String(error)),"error");
   } finally {
@@ -747,6 +875,7 @@ $("loginForm").addEventListener("submit",async event => {
 
 $("logoutButton").addEventListener("click",async () => {
   const {error} = await db.auth.signOut();
+
   if (error) showMessage($("globalMessage"),error.message,"error");
   else showLogin();
 });
@@ -771,8 +900,10 @@ db.auth.onAuthStateChange((event,session) => {
   try {
     const {data,error} = await db.auth.getSession();
     if (error) throw error;
+
     if (data.session) await showApp(data.session);
     else showLogin();
+
   } catch (error) {
     showMessage($("loginMessage"),
       "Could not connect to Supabase. " + (error.message || String(error)),
