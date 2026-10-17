@@ -3,456 +3,611 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <title>501 Mining | Mine Manager</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
-:root{--blue:#174a86;--blue2:#eaf1fa;--bg:#f4f7fb;--white:#fff;--text:#243247;--muted:#718096;--border:#dce4ee;--green:#16845b;--red:#b83232}
+:root {
+  --blue:#155eef;
+  --blue-dark:#1248b5;
+  --bg:#f4f7fb;
+  --white:#fff;
+  --text:#172033;
+  --muted:#667085;
+  --border:#dfe5ee;
+  --green:#16803c;
+  --red:#b42318;
+}
 *{box-sizing:border-box}
-body{margin:0;background:var(--bg);color:var(--text);font-family:Arial,sans-serif}
-header{background:white;padding:17px 16px 12px;border-bottom:1px solid var(--border)}
-.brand{display:flex;align-items:center;gap:12px}
-.logo{background:var(--blue);color:white;border-radius:10px;padding:12px;font-size:21px;font-weight:bold}
-h1{margin:0;color:var(--blue);font-size:23px}
-header p{margin:4px 0;color:var(--muted);font-size:13px}
-main{max-width:1100px;margin:auto;padding:14px}
-.panel,.metric{background:white;border:1px solid var(--border);border-radius:13px;padding:16px;margin-bottom:13px}
-h2{margin:0 0 12px;font-size:19px;color:var(--blue)}
-h3{font-size:15px}
-.muted{color:var(--muted);font-size:13px;line-height:1.5}
-nav{display:flex;gap:8px;overflow-x:auto;padding:3px 2px 12px;margin:8px 0 12px;scrollbar-width:thin;-webkit-overflow-scrolling:touch}
-nav button{flex:0 0 auto;width:auto;white-space:nowrap;margin:0;background:white;border:1px solid var(--border);color:var(--blue);padding:12px 15px;border-radius:9px}
-nav button.active{background:var(--blue);color:white;border-color:var(--blue)}
-button,input,select,textarea{font:inherit}
-button{cursor:pointer}
-.action{background:var(--blue);color:white;border:0;border-radius:9px;padding:12px 16px;font-weight:bold;width:100%;margin-top:10px}
-.secondary{background:var(--blue2);color:var(--blue);border:1px solid var(--border);border-radius:9px;padding:10px 14px}
-input,select,textarea{width:100%;padding:12px;border:1px solid #cbd5e1;border-radius:8px;background:white;color:var(--text);margin-top:6px}
-textarea{min-height:85px;resize:vertical}
-label{display:block;margin-top:12px;font-size:13px;font-weight:bold;color:#46556b}
-.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
-.metric span{font-size:12px;color:var(--muted)}
-.metric strong{display:block;font-size:25px;color:var(--blue);margin-top:8px;overflow-wrap:anywhere}
+body{margin:0;background:var(--bg);font-family:Arial,sans-serif;color:var(--text)}
+header{background:#fff;padding:16px;border-bottom:1px solid var(--border)}
+.brand{font-size:23px;font-weight:800;color:var(--blue)}
+.subtitle{font-size:13px;color:var(--muted);margin-top:5px}
+#authBar{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:12px}
+button,.btn{background:var(--blue);color:white;border:0;border-radius:8px;padding:11px 14px;font-weight:700;cursor:pointer}
+button:hover{background:var(--blue-dark)}
+button.secondary{background:#e8efff;color:var(--blue)}
+button.danger{background:#b42318}
+input,select,textarea{width:100%;padding:11px;border:1px solid #cfd6e2;border-radius:7px;font:inherit;background:white}
+textarea{min-height:90px;resize:vertical}
+label{display:block;font-size:13px;font-weight:700;margin-bottom:6px}
+nav{display:flex;overflow-x:auto;gap:8px;padding:12px;background:#fff;border-bottom:1px solid var(--border);white-space:nowrap}
+nav button{flex:0 0 auto;padding:10px 13px}
+nav button.active{background:#0e367f}
+main{padding:15px;max-width:1200px;margin:auto}
+h2{font-size:21px;margin:5px 0 8px}
+h3{font-size:16px;margin:0 0 12px}
+.muted{color:var(--muted);font-size:13px}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px}
+.metrics{display:grid;grid-template-columns:repeat(auto-fit,minmax(145px,1fr));gap:12px;margin:16px 0}
+.card{background:#fff;border:1px solid var(--border);border-radius:12px;padding:16px;margin-bottom:14px;min-width:0}
+.metric-number{font-size:26px;font-weight:800;color:var(--blue);margin-top:8px;overflow-wrap:anywhere}
+.field{margin-bottom:13px;min-width:0}
+.actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+.status{padding:11px;border-radius:8px;margin:10px 0;white-space:pre-wrap;overflow-wrap:anywhere;font-size:13px}
+.info{background:#eaf2ff;color:#174ea6}
+.success{background:#e8f7ed;color:#176534}
+.error{background:#fff0ee;color:#a32117}
+.raw{background:#101828;color:#e6edf7;padding:12px;border-radius:8px;overflow:auto;white-space:pre-wrap;overflow-wrap:anywhere;font:12px/1.5 monospace;max-height:420px}
+.record{padding:12px;border:1px solid var(--border);border-radius:9px;margin-top:9px;background:white;overflow-wrap:anywhere}
+.record-title{font-weight:800;margin-bottom:5px}
 .hidden{display:none!important}
-.status{white-space:pre-wrap;overflow-wrap:anywhere;font-size:13px;line-height:1.5}
-.stockrow{border:1px solid var(--border);padding:14px;border-radius:10px;margin:10px 0}
-.stockrow strong{color:var(--blue);font-size:17px}
-.stockamount{font-size:24px;font-weight:bold;margin:8px 0}
-.pill{display:inline-block;background:var(--blue2);color:var(--blue);padding:5px 8px;border-radius:6px;font-size:12px}
-pre{white-space:pre-wrap;overflow-wrap:anywhere;font-size:12px}
-@media(min-width:700px){.grid{grid-template-columns:repeat(4,minmax(0,1fr))}.formgrid{display:grid;grid-template-columns:1fr 1fr;gap:12px}}
+.small{font-size:12px}
+footer{text-align:center;padding:20px;color:var(--muted);font-size:12px}
+hr{border:0;border-top:1px solid var(--border);margin:15px 0}
 </style>
 </head>
 <body>
+
 <header>
-  <div class="brand">
-    <div class="logo">501</div>
-    <div>
-      <h1>501 MINING</h1>
-      <p>Mine Management System</p>
-    </div>
+  <div class="brand">501 MINING</div>
+  <div class="subtitle">Mine Manager Dashboard</div>
+  <div id="authBar">
+    <span id="authStatus" class="muted">Checking connection...</span>
+    <button id="signOutBtn" class="secondary hidden" type="button">Sign out</button>
   </div>
 </header>
 
-<main>
-<section id="login" class="panel">
-  <h2>Manager sign in</h2>
-  <p class="muted">Sign in using your existing Supabase account.</p>
+<section id="loginPanel" class="card" style="margin:15px">
+  <h3>Manager sign in</h3>
+  <p class="muted">Sign in with your existing Supabase account.</p>
   <form id="loginForm">
-    <label>Email address</label>
-    <input id="email" type="email" autocomplete="username" required>
-    <label>Password</label>
-    <input id="password" type="password" autocomplete="current-password" required>
-    <button class="action" id="loginBtn">Sign in</button>
+    <div class="field">
+      <label for="email">Email address</label>
+      <input id="email" type="email" autocomplete="username" required>
+    </div>
+    <div class="field">
+      <label for="password">Password</label>
+      <input id="password" type="password" autocomplete="current-password" required>
+    </div>
+    <button type="submit">Sign in</button>
+    <div id="loginMessage" class="status hidden"></div>
   </form>
-  <p id="loginMsg" class="status"></p>
 </section>
 
-<section id="app" class="hidden">
-  <div class="panel">
-    <strong id="welcome">Mine Manager</strong>
-    <p id="today" class="muted"></p>
-    <button class="secondary" id="homeBtn">Dashboard</button>
-    <button class="secondary" id="refreshBtn">Refresh figures</button>
-    <button class="secondary" id="logoutBtn">Sign out</button>
+<div id="app" class="hidden">
+<nav id="nav">
+  <button class="active" data-page="dashboard">Dashboard</button>
+  <button data-page="production">Production</button>
+  <button data-page="pickups">Customer Pickups</button>
+  <button data-page="stockpiles">Stockpiles</button>
+  <button data-page="hours">Machine Hours</button>
+  <button data-page="breakdowns">Breakdowns</button>
+  <button data-page="jobs">Job Cards</button>
+  <button data-page="diesel">Diesel</button>
+  <button data-page="maintenance">Maintenance</button>
+  <button data-page="duties">Staff Duties</button>
+  <button data-page="safety">Safety</button>
+  <button data-page="approvals">Approvals</button>
+  <button data-page="reports">WhatsApp Reports</button>
+</nav>
+
+<main>
+<section id="page-dashboard" class="page">
+  <h2>Mine overview</h2>
+  <p class="muted">501 Mining daily operations and management.</p>
+  <div class="metrics">
+    <div class="card"><div class="muted">Production records</div><div id="metricProduction" class="metric-number">—</div></div>
+    <div class="card"><div class="muted">Customer pickups</div><div id="metricPickups" class="metric-number">—</div></div>
+    <div class="card"><div class="muted">Open breakdowns</div><div id="metricBreakdowns" class="metric-number">—</div></div>
+    <div class="card"><div class="muted">Pending approvals</div><div id="metricApprovals" class="metric-number">—</div></div>
   </div>
-
-  <nav id="navigation" aria-label="Mine management sections">
-    <button data-view="home" class="active">Dashboard</button>
-    <button data-view="production">Production</button>
-    <button data-view="pickups">Customer Pickups</button>
-    <button data-view="stockpiles">Stockpiles</button>
-    <button data-view="hours">Machine Hours</button>
-    <button data-view="breakdowns">Breakdowns</button>
-    <button data-view="jobs">Job Cards</button>
-    <button data-view="diesel">Diesel</button>
-    <button data-view="maintenance">Maintenance</button>
-    <button data-view="duties">Staff Duties</button>
-    <button data-view="safety">Safety</button>
-    <button data-view="approvals">Approvals</button>
-    <button data-view="report">Daily Report</button>
-  </nav>
-
-  <section id="home">
-    <h2>Mine Dashboard</h2>
-    <div class="grid">
-      <div class="metric"><span>Production entries</span><strong id="productionCount">—</strong></div>
-      <div class="metric"><span>Customer pickups</span><strong id="pickupCount">—</strong></div>
-      <div class="metric"><span>Open breakdowns</span><strong id="breakdownCount">—</strong></div>
-      <div class="metric"><span>Pending approvals</span><strong id="approvalCount">—</strong></div>
-    </div>
-    <div class="panel">
-      <h2>Stockpile management</h2>
-      <p class="muted">Record sand produced in Production. Record sand collected in Customer Pickups. Your existing database triggers should update stock automatically.</p>
-      <button class="action" onclick="showView('production')">+ Add Production</button>
-      <button class="action" onclick="showView('pickups')">Record Customer Pickup</button>
-      <button class="secondary" style="width:100%;margin-top:10px" onclick="showView('stockpiles')">View Stockpiles</button>
-    </div>
-  </section>
-
-  <section id="entryPanel" class="panel hidden">
-    <h2 id="formTitle"></h2>
-    <p id="formDescription" class="muted"></p>
-    <form id="entryForm"></form>
-    <p id="formMsg" class="status" role="status"></p>
-  </section>
-
-  <section id="recordsPanel" class="panel hidden">
-    <h2 id="recordsTitle">Records</h2>
-    <button id="reloadRecords" class="secondary">Refresh records</button>
-    <p id="recordsMsg" class="status muted"></p>
-    <div id="stockpileCards"></div>
-    <pre id="records"></pre>
-  </section>
+  <div class="card">
+    <h3>Stockpile summary</h3>
+    <div id="dashboardStock" class="muted">Load the stockpile page to retrieve current balances.</div>
+    <div class="actions"><button type="button" onclick="showPage('stockpiles')">Open stockpiles</button></div>
+  </div>
+  <div class="card">
+    <h3>Connection diagnostics</h3>
+    <div id="connectionMessage" class="status info">Waiting for sign-in.</div>
+    <button type="button" onclick="refreshDashboard()">Refresh dashboard</button>
+  </div>
 </section>
+
+<section id="page-production" class="page hidden">
+  <h2>Production</h2>
+  <p class="muted">Record sand produced. Your existing database trigger should update stock automatically.</p>
+  <div id="form-production"></div><div id="list-production"></div>
+</section>
+
+<section id="page-pickups" class="page hidden">
+  <h2>Customer pickups</h2>
+  <p class="muted">Record sand collected by customers. Your existing database trigger should deduct stock automatically.</p>
+  <div id="form-pickups"></div><div id="list-pickups"></div>
+</section>
+
+<section id="page-stockpiles" class="page hidden">
+  <h2>Stockpiles</h2>
+  <p class="muted">Live data from the stockpile_balances database view/table. This page does not manually add or subtract stock.</p>
+  <div class="card">
+    <div class="actions">
+      <button type="button" onclick="loadStockpiles()">Refresh stockpiles</button>
+      <button type="button" class="secondary" onclick="toggleRaw()">Show/hide raw data</button>
+    </div>
+    <div id="stockStatus" class="status info">Stockpile data has not been loaded yet.</div>
+    <div id="stockCards"></div>
+    <div id="rawWrap" class="hidden">
+      <h3 style="margin-top:16px">Raw database response</h3>
+      <pre id="rawStock" class="raw">No response yet.</pre>
+    </div>
+  </div>
+</section>
+
+<section id="page-hours" class="page hidden"><h2>Machine Hours</h2><div id="form-hours"></div><div id="list-hours"></div></section>
+<section id="page-breakdowns" class="page hidden"><h2>Machine Breakdowns</h2><div id="form-breakdowns"></div><div id="list-breakdowns"></div></section>
+<section id="page-jobs" class="page hidden"><h2>Job Cards</h2><div id="form-jobs"></div><div id="list-jobs"></div></section>
+<section id="page-diesel" class="page hidden"><h2>Diesel Logs</h2><div id="form-diesel"></div><div id="list-diesel"></div></section>
+<section id="page-maintenance" class="page hidden"><h2>Maintenance</h2><div id="form-maintenance"></div><div id="list-maintenance"></div></section>
+<section id="page-duties" class="page hidden"><h2>Staff Duties</h2><div id="form-duties"></div><div id="list-duties"></div></section>
+<section id="page-safety" class="page hidden"><h2>Safety Inspections</h2><div id="form-safety"></div><div id="list-safety"></div></section>
+<section id="page-approvals" class="page hidden"><h2>Approval Requests</h2><p class="muted">Record requests and track their status.</p><div id="form-approvals"></div><div id="list-approvals"></div></section>
+<section id="page-reports" class="page hidden"><h2>Daily WhatsApp Reports</h2><div id="form-reports"></div><div id="list-reports"></div></section>
 </main>
+</div>
+
+<footer>501 Mining · Mine Manager Dashboard</footer>
 
 <script>
-"use strict";
+/* Use your Supabase project URL and publishable key. Never put a service-role key here. */
+const SUPABASE_URL = "https://guintqihzpecbjvdgtdg.supabase.co";
+const SUPABASE_KEY = "sb_publishable_ts9yQRmjpbnmxFAtukasYQ_7nacpxta";
+const db = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-const SUPABASE_URL="https://guintqihzpecbjvdgtdg.supabase.co";
-const SUPABASE_PUBLISHABLE_KEY="sb_publishable_ts9yQRmjpbnmxFAtukasYQ_7nacpxta";
+let currentUser = null;
+let rawVisible = true;
 
-const $=id=>document.getElementById(id);
-let db=null;
-let currentUser=null;
-let activeView="home";
-
-const sections={
-production:{
-title:"Add Production",
-table:"production_entries",
-description:"Record building sand or plaster sand produced. A successful entry should update stock through your existing production trigger.",
-fields:[
-["material","Sand type","select",["Building sand","Plaster sand"],true],
-["quantity_m3","Quantity produced (m³)","number",null,true],
-["machine_id","Machine / plant","text",null,false],
-["start_time","Start time","time",null,false],
-["end_time","End time","time",null,false],
-["produced_at","Date and time","datetime-local",null,true],
-["notes","Notes","textarea",null,false]
-]},
-pickups:{
-title:"Customer Pickup",
-table:"client_pickups",
-description:"Record the quantity a customer collects. The existing pickup trigger should deduct it from stock.",
-fields:[
-["client_name","Customer / company","text",null,true],
-["material","Sand type","select",["Building sand","Plaster sand"],true],
-["quantity_m3","Quantity collected (m³)","number",null,true],
-["truck_registration","Truck registration","text",null,false],
-["delivery_note_number","Delivery note number","text",null,false],
-["collected_at","Collection date and time","datetime-local",null,true],
-["notes","Notes","textarea",null,false]
-]},
-hours:{
-title:"Machine Hours",
-table:"daily_machine_hours",
-description:"Record machine readings for the shift.",
-fields:[
-["work_date","Date","date",null,true],
-["machine_name","Machine","text",null,true],
-["operator_name","Operator","text",null,false],
-["start_hours","Starting hour-meter reading","number",null,true],
-["end_hours","Ending hour-meter reading","number",null,true],
-["hours_worked","Hours worked","number",null,false],
-["notes","Notes","textarea",null,false]
-]},
-breakdowns:{
-title:"Machine Breakdown",
-table:"machine_breakdowns",
-description:"Record faults and track repairs.",
-fields:[
-["machine_name","Machine","text",null,true],
-["breakdown_date","Date and time","datetime-local",null,true],
-["problem_description","Fault description","textarea",null,true],
-["downtime_hours","Downtime (hours)","number",null,false],
-["status","Status","select",["Open","In progress","Resolved"],true],
-["notes","Repair details / notes","textarea",null,false]
-]},
-jobs:{
-title:"Job Card",
-table:"job_cards",
-description:"Create a repair, service or maintenance job.",
-fields:[
-["job_card_number","Job card number","text",null,false],
-["machine_name","Machine","text",null,true],
-["job_description","Work required","textarea",null,true],
-["priority","Priority","select",["Low","Normal","High","Urgent"],true],
-["assigned_to","Assigned to","text",null,false],
-["status","Status","select",["Open","In progress","Completed"],true],
-["notes","Notes","textarea",null,false]
-]},
-diesel:{
-title:"Diesel Log",
-table:"diesel_logs",
-description:"Record fuel issued to a machine or vehicle.",
-fields:[
-["log_date","Date and time","datetime-local",null,true],
-["machine_name","Machine / vehicle","text",null,true],
-["litres","Litres issued","number",null,true],
-["hour_meter","Hour-meter reading","number",null,false],
-["issued_to","Issued to","text",null,false],
-["notes","Notes","textarea",null,false]
-]},
-maintenance:{
-title:"Maintenance Record",
-table:"maintenance_records",
-description:"Record planned and completed maintenance.",
-fields:[
-["maintenance_date","Date","date",null,true],
-["machine_name","Machine","text",null,true],
-["maintenance_type","Type","select",["Service","Repair","Inspection","Other"],true],
-["description","Work required / completed","textarea",null,true],
-["cost","Cost (R)","number",null,false],
-["next_service_hours","Next service reading","number",null,false],
-["notes","Notes","textarea",null,false]
-]},
-duties:{
-title:"Staff Duties",
-table:"staff_duties",
-description:"Assign and track staff tasks.",
-fields:[
-["duty_date","Date","date",null,true],
-["staff_name","Staff member","text",null,true],
-["duty_description","Duty / task","textarea",null,true],
-["status","Status","select",["Assigned","In progress","Completed"],true],
-["notes","Notes","textarea",null,false]
-]},
-safety:{
-title:"Safety Inspection",
-table:"safety_inspections",
-description:"Record inspection findings and corrective actions.",
-fields:[
-["inspection_date","Inspection date","date",null,true],
-["inspected_by","Inspected by","text",null,true],
-["area","Area / machine","text",null,true],
-["findings","Inspection findings","textarea",null,true],
-["corrective_action","Corrective action","textarea",null,false],
-["status","Status","select",["Safe","Action required","Follow-up needed"],true],
-["notes","Notes","textarea",null,false]
-]},
-approvals:{
-title:"Approval Request",
-table:"approval_requests",
-description:"Submit a request for manager or boss approval.",
-fields:[
-["request_title","Request title","text",null,true],
-["request_description","Reason / details","textarea",null,true],
-["amount","Amount requested (R)","number",null,false],
-["requested_by_name","Requested by","text",null,true],
-["status","Status","select",["Pending","Approved","Rejected"],true]
-]},
-report:{
-title:"Daily WhatsApp Report",
-table:"daily_whatsapp_report",
-description:"Write and save your daily report. You can copy the text for WhatsApp after saving.",
-fields:[
-["report_date","Report date","date",null,true],
-["report_text","Daily report text","textarea",null,true]
-]}
+const configs = {
+  production: {
+    title:"Production entry", table:"production_entries",
+    fields:[
+      ["material","Sand type","text",true],
+      ["quantity_m3","Quantity (m³)","number",true],
+      ["machine_id","Machine ID or name","text",false],
+      ["start_time","Start time","datetime-local",false],
+      ["end_time","End time","datetime-local",false],
+      ["produced_at","Production date and time","datetime-local",false],
+      ["notes","Notes","textarea",false]
+    ]
+  },
+  pickups: {
+    title:"Customer pickup", table:"client_pickups",
+    fields:[
+      ["client_name","Customer name","text",true],
+      ["material","Sand type","text",true],
+      ["quantity_m3","Quantity collected (m³)","number",true],
+      ["truck_registration","Truck registration","text",false],
+      ["delivery_note_number","Delivery note number","text",false],
+      ["collected_at","Collection date and time","datetime-local",false],
+      ["notes","Notes","textarea",false]
+    ]
+  },
+  hours: {
+    title:"Machine hours entry", table:"daily_machine_hours",
+    fields:[
+      ["work_date","Work date","date",true],
+      ["machine_name","Machine","text",true],
+      ["operator_name","Operator","text",false],
+      ["start_hours","Starting hour meter","number",false],
+      ["end_hours","Ending hour meter","number",false],
+      ["hours_worked","Hours worked","number",false],
+      ["notes","Notes","textarea",false]
+    ]
+  },
+  breakdowns: {
+    title:"Breakdown report", table:"machine_breakdowns",
+    fields:[
+      ["machine_name","Machine","text",true],
+      ["breakdown_date","Breakdown date","date",true],
+      ["problem_description","Problem description","textarea",true],
+      ["downtime_hours","Downtime (hours)","number",false],
+      ["status","Status","select",true,["Open","In progress","Awaiting parts","Resolved"]],
+      ["notes","Notes","textarea",false]
+    ]
+  },
+  jobs: {
+    title:"Job card", table:"job_cards",
+    fields:[
+      ["job_card_number","Job card number","text",false],
+      ["machine_name","Machine","text",true],
+      ["job_description","Job description","textarea",true],
+      ["priority","Priority","select",true,["Low","Normal","High","Urgent"]],
+      ["assigned_to","Assigned to","text",false],
+      ["status","Status","select",true,["Open","In progress","Waiting for parts","Completed"]],
+      ["notes","Notes","textarea",false]
+    ]
+  },
+  diesel: {
+    title:"Diesel issue", table:"diesel_logs",
+    fields:[
+      ["log_date","Date","date",true],
+      ["machine_name","Machine","text",true],
+      ["litres","Litres issued","number",true],
+      ["hour_meter","Hour meter","number",false],
+      ["issued_to","Issued to","text",false],
+      ["notes","Notes","textarea",false]
+    ]
+  },
+  maintenance: {
+    title:"Maintenance record", table:"maintenance_records",
+    fields:[
+      ["maintenance_date","Date","date",true],
+      ["machine_name","Machine","text",true],
+      ["maintenance_type","Maintenance type","text",true],
+      ["description","Work completed or required","textarea",true],
+      ["cost","Cost (R)","number",false],
+      ["next_service_hours","Next service hour meter","number",false],
+      ["notes","Notes","textarea",false]
+    ]
+  },
+  duties: {
+    title:"Staff duty", table:"staff_duties",
+    fields:[
+      ["duty_date","Date","date",true],
+      ["staff_name","Staff member","text",true],
+      ["duty_description","Duty","textarea",true],
+      ["status","Status","select",true,["Assigned","In progress","Completed"]],
+      ["notes","Notes","textarea",false]
+    ]
+  },
+  safety: {
+    title:"Safety inspection", table:"safety_inspections",
+    fields:[
+      ["inspection_date","Inspection date","date",true],
+      ["inspected_by","Inspected by","text",true],
+      ["area","Area or machine inspected","text",true],
+      ["findings","Findings","textarea",true],
+      ["corrective_action","Corrective action","textarea",false],
+      ["status","Status","select",true,["Open","In progress","Closed"]],
+      ["notes","Notes","textarea",false]
+    ]
+  },
+  approvals: {
+    title:"Approval request", table:"approval_requests",
+    fields:[
+      ["request_title","Request title","text",true],
+      ["request_description","Description and reason","textarea",true],
+      ["amount","Amount requested (R)","number",false],
+      ["requested_by_name","Requested by","text",true],
+      ["status","Status","select",true,["Pending","Approved","Rejected"]]
+    ]
+  },
+  reports: {
+    title:"Daily report", table:"daily_whatsapp_report",
+    fields:[
+      ["report_date","Report date","date",true],
+      ["report_text","Report text","textarea",true]
+    ]
+  }
 };
 
-function localNow(type){
-const d=new Date();
-const local=new Date(d.getTime()-d.getTimezoneOffset()*60000).toISOString();
-return type==="date"?local.slice(0,10):local.slice(0,16);
+function safeId(value){return String(value).replace(/[^a-zA-Z0-9_-]/g,"_");}
+function esc(value){
+  return String(value ?? "").replace(/[&<>"']/g, c => ({
+    "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"
+  }[c]));
 }
-function esc(s){
-return String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+function message(el,text,type="info"){
+  if(!el)return;
+  el.className="status "+type;
+  el.textContent=text;
+  el.classList.remove("hidden");
 }
-function setStatus(id,msg){$(id).textContent=msg;}
-
-function showView(view){
-activeView=view;
-$("home").classList.toggle("hidden",view!=="home");
-$("entryPanel").classList.add("hidden");
-$("recordsPanel").classList.add("hidden");
-document.querySelectorAll("#navigation button").forEach(b=>b.classList.toggle("active",b.dataset.view===view));
-if(view==="home")return;
-if(view==="stockpiles"){
-$("recordsPanel").classList.remove("hidden");
-$("recordsTitle").textContent="Current Stockpiles";
-$("stockpileCards").innerHTML="";
-loadStockpiles();
-return;
+function showPage(name){
+  document.querySelectorAll(".page").forEach(p=>p.classList.add("hidden"));
+  const page=document.getElementById("page-"+name);
+  if(page)page.classList.remove("hidden");
+  document.querySelectorAll("#nav button").forEach(b=>{
+    b.classList.toggle("active",b.dataset.page===name);
+  });
+  if(name==="stockpiles")loadStockpiles();
+  if(name==="dashboard")refreshDashboard();
+  if(configs[name])loadRecords(name);
 }
-const section=sections[view];
-if(!section)return;
-$("entryPanel").classList.remove("hidden");
-$("formTitle").textContent=section.title;
-$("formDescription").textContent=section.description;
-$("formMsg").textContent="";
-$("entryForm").innerHTML=section.fields.map(([name,label,type,options,required])=>{
-let req=required?"required":"";
-let input;
-if(type==="select"){
-input='<select name="'+name+'" '+req+'><option value="">Choose...</option>'+options.map(o=>'<option>'+esc(o)+'</option>').join("")+'</select>';
-}else if(type==="textarea"){
-input='<textarea name="'+name+'" '+req+'></textarea>';
-}else{
-input='<input name="'+name+'" type="'+type+'" '+(type==="number"?'min="0" step="any"':"")+' '+req+'>';
-}
-return '<label>'+esc(label)+input+'</label>';
-}).join("")+'<button id="saveEntry" class="action" type="submit">Save '+esc(section.title)+'</button>';
-section.fields.forEach(([name,label,type])=>{
-const input=$("entryForm").elements[name];
-if(!input)return;
-if(["produced_at","collected_at","log_date","breakdown_date"].includes(name))input.value=localNow("datetime-local");
-if(["work_date","maintenance_date","duty_date","inspection_date","report_date"].includes(name))input.value=localNow("date");
+document.querySelectorAll("#nav button").forEach(button=>{
+  button.addEventListener("click",()=>showPage(button.dataset.page));
 });
-$("entryForm").onsubmit=saveEntry;
+
+function buildForm(key){
+  const cfg=configs[key];
+  const target=document.getElementById("form-"+key);
+  if(!cfg||!target)return;
+  const formId="entry-"+key;
+  let html=`<div class="card"><h3>${esc(cfg.title)}</h3>
+  <form id="${formId}"><div class="grid">`;
+  cfg.fields.forEach(f=>{
+    const [name,label,type,required,options]=f;
+    const id=`${formId}-${safeId(name)}`;
+    html+=`<div class="field"><label for="${id}">${esc(label)}${required?" *":""}</label>`;
+    if(type==="textarea"){
+      html+=`<textarea id="${id}" name="${esc(name)}" ${required?"required":""}></textarea>`;
+    }else if(type==="select"){
+      html+=`<select id="${id}" name="${esc(name)}" ${required?"required":""}>
+      <option value="">Choose...</option>${options.map(o=>`<option value="${esc(o)}">${esc(o)}</option>`).join("")}</select>`;
+    }else{
+      html+=`<input id="${id}" name="${esc(name)}" type="${esc(type)}"
+        ${type==="number"?'step="any" min="0"':""} ${required?"required":""}>`;
+    }
+    html+="</div>";
+  });
+  html+=`</div><div class="actions"><button type="submit">Save record</button>
+  <button type="reset" class="secondary">Clear form</button></div>
+  <div id="${formId}-message" class="status hidden"></div></form></div>`;
+  target.innerHTML=html;
+  document.getElementById(formId).addEventListener("submit",e=>saveRecord(e,key));
 }
 
-async function saveEntry(event){
-event.preventDefault();
-const section=sections[activeView];
-if(!section||!currentUser)return;
-const button=$("saveEntry");
-button.disabled=true;
-setStatus("formMsg","Saving record...");
-const record={};
-for(const [name,label,type] of section.fields){
-const input=$("entryForm").elements[name];
-if(!input)continue;
-let value=input.value.trim();
-if(value==="")value=null;
-if(type==="number"&&value!==null)value=Number(value);
-if(["produced_at","collected_at","log_date","breakdown_date"].includes(name)&&value)value=new Date(value).toISOString();
-record[name]=value;
-}
-if(section.table==="production_entries"||section.table==="client_pickups")record.entered_by=currentUser.id;
-
-try{
-const {error}=await db.from(section.table).insert(record);
-if(error)throw error;
-setStatus("formMsg","Saved successfully.");
-$("entryForm").reset();
-await refreshDashboard();
-if(activeView==="report"&&record.report_text){
-const copy=document.createElement("button");
-copy.type="button";copy.className="secondary";copy.textContent="Copy report for WhatsApp";
-copy.onclick=async()=>{
-try{await navigator.clipboard.writeText(record.report_text);setStatus("formMsg","Report copied. Paste it into WhatsApp.");}
-catch(e){setStatus("formMsg","Report saved. Clipboard access was blocked; open saved records and copy the text manually.");}
-};
-$("entryForm").appendChild(copy);
-}
-}catch(error){
-setStatus("formMsg","SAVE FAILED: "+error.message+"\nYour form is working, but the database may use different column names or permissions. Send me this exact error.");
-}finally{button.disabled=false;}
+function toDatabaseValue(type,value){
+  if(value==="")return null;
+  if(type==="number")return Number(value);
+  if(type==="datetime-local")return new Date(value).toISOString();
+  return value;
 }
 
+async function saveRecord(event,key){
+  event.preventDefault();
+  const cfg=configs[key];
+  const form=event.currentTarget;
+  const msg=document.getElementById(form.id+"-message");
+  if(!currentUser){message(msg,"Please sign in first.","error");return;}
+  const data={};
+  for(const f of cfg.fields){
+    const el=form.elements[f[0]];
+    if(el)data[f[0]]=toDatabaseValue(f[2],el.value);
+  }
+  // The logged-in user is recorded only if your table has a compatible column.
+  // Avoid adding unconfirmed columns that could make a valid insert fail.
+  const button=form.querySelector('button[type="submit"]');
+  button.disabled=true;
+  button.textContent="Saving...";
+  try{
+    const {error}=await db.from(cfg.table).insert(data);
+    if(error)throw error;
+    message(msg,"Record saved successfully.","success");
+    form.reset();
+    await loadRecords(key);
+    await refreshDashboard();
+    if(key==="production"||key==="pickups")await loadStockpiles();
+  }catch(err){
+    message(msg,"Could not save record:\n"+(err.message||JSON.stringify(err))+
+      "\n\nCheck the table name, column names and Supabase permissions.","error");
+  }finally{
+    button.disabled=false;
+    button.textContent="Save record";
+  }
+}
+
+async function loadRecords(key){
+  const cfg=configs[key];
+  const target=document.getElementById("list-"+key);
+  if(!cfg||!target||!currentUser)return;
+  target.innerHTML='<div class="card muted">Loading records...</div>';
+  try{
+    const {data,error}=await db.from(cfg.table).select("*").limit(25);
+    if(error)throw error;
+    if(!data||data.length===0){
+      target.innerHTML='<div class="card muted">No records returned from this table yet.</div>';
+      return;
+    }
+    target.innerHTML=`<div class="card"><h3>Recent records (${data.length})</h3>`+
+      data.map((row,i)=>`<div class="record">
+        <div class="record-title">Record ${i+1}</div>
+        <pre class="raw">${esc(JSON.stringify(row,null,2))}</pre>
+      </div>`).join("")+"</div>";
+  }catch(err){
+    target.innerHTML=`<div class="card"><div class="status error">${esc(
+      "Could not read "+cfg.table+": "+(err.message||JSON.stringify(err))
+    )}</div></div>`;
+  }
+}
+
+/* STOCKPILE FIX: query every column and show the exact Supabase response. */
 async function loadStockpiles(){
-setStatus("recordsMsg","Loading current stock balances...");
-$("records").textContent="";
-$("stockpileCards").innerHTML="";
-try{
-const {data,error}=await db.from("stockpile_balances").select("*");
-if(error)throw error;
-setStatus("recordsMsg",data.length+" stockpile record(s) found.");
-if(!data.length){$("records").textContent="No stockpile balances found.";return;}
-data.forEach(row=>{
-const card=document.createElement("div");
-card.className="stockrow";
-card.innerHTML="<strong>"+esc(row.material||row.sand_type||row.product||"Sand stockpile")+"</strong><div class='stockamount'>"+esc(row.quantity_m3??row.balance_m3??row.quantity??row.balance??"—")+" m³</div><span class='pill'>Live database balance</span>";
-$("stockpileCards").appendChild(card);
-});
-$("records").textContent="Raw stockpile data:\n"+JSON.stringify(data,null,2);
-}catch(error){
-setStatus("recordsMsg","Could not load stockpiles: "+error.message);
-}
-}
+  const status=document.getElementById("stockStatus");
+  const cards=document.getElementById("stockCards");
+  const raw=document.getElementById("rawStock");
+  const dashboardStock=document.getElementById("dashboardStock");
+  if(!currentUser){
+    message(status,"Sign in before loading stockpile data.","error");
+    raw.textContent="Not signed in.";
+    return;
+  }
+  message(status,"Connecting to Supabase and reading stockpile_balances...","info");
+  cards.innerHTML="";
+  raw.textContent="Loading...";
+  try{
+    const {data,error,count}=await db
+      .from("stockpile_balances")
+      .select("*",{count:"exact"})
+      .limit(500);
 
-async function loadRecords(){
-if(activeView==="stockpiles"){await loadStockpiles();return;}
-const section=sections[activeView];
-if(!section)return;
-setStatus("recordsMsg","Loading records...");
-try{
-const {data,error}=await db.from(section.table).select("*").limit(100);
-if(error)throw error;
-setStatus("recordsMsg",data.length+" record(s) found.");
-$("records").textContent=JSON.stringify(data,null,2);
-}catch(error){setStatus("recordsMsg","Could not load records: "+error.message);}
+    if(error){
+      raw.textContent=JSON.stringify({
+        table:"stockpile_balances",
+        error:{
+          message:error.message,
+          details:error.details,
+          hint:error.hint,
+          code:error.code
+        }
+      },null,2);
+      message(status,
+        "Supabase returned an error for stockpile_balances.\n"+
+        (error.message||"Unknown database error")+
+        (error.details?"\nDetails: "+error.details:"")+
+        (error.hint?"\nHint: "+error.hint:"")+
+        (error.code?"\nCode: "+error.code:""),
+        "error");
+      dashboardStock.textContent="Could not load stockpiles: "+error.message;
+      return;
+    }
+
+    // Display the complete response without assuming specific column names.
+    raw.textContent=JSON.stringify({
+      table:"stockpile_balances",
+      rows_returned:data?.length??0,
+      count:count,
+      data:data
+    },null,2);
+
+    if(!data||data.length===0){
+      message(status,
+        "The query worked, but Supabase returned zero rows. "+
+        "The view may be empty, or its underlying data may not contain any stockpile movements.",
+        "info");
+      cards.innerHTML='<div class="record">No stockpile rows were returned.</div>';
+      dashboardStock.textContent="No stockpile rows returned.";
+      return;
+    }
+
+    message(status,"Success: "+data.length+" stockpile row(s) returned from Supabase.","success");
+    cards.innerHTML=data.map((row,index)=>{
+      const entries=Object.entries(row);
+      const title=row.material??row.sand_type??row.product??row.stockpile_name??("Stockpile "+(index+1));
+      const quantityKeys=["current_stock_m3","balance_m3","quantity_m3","balance","quantity","current_stock","stock_quantity"];
+      const qtyKey=quantityKeys.find(k=>row[k]!==undefined&&row[k]!==null);
+      const qty=qtyKey?`${row[qtyKey]} (${qtyKey})`:"Quantity column not identified";
+      return `<div class="record">
+        <div class="record-title">${esc(title)}</div>
+        <div>${esc(qty)}</div>
+        <details style="margin-top:10px"><summary>View this raw row</summary>
+          <pre class="raw">${esc(JSON.stringify(row,null,2))}</pre>
+        </details>
+      </div>`;
+    }).join("");
+
+    dashboardStock.innerHTML=`<strong>${data.length}</strong> stockpile row(s) loaded.
+      <button type="button" class="secondary" onclick="showPage('stockpiles')">View details</button>`;
+  }catch(err){
+    const details={
+      message:err.message||String(err),
+      name:err.name||null,
+      stack:err.stack||null
+    };
+    raw.textContent=JSON.stringify(details,null,2);
+    message(status,"Unexpected error while loading stockpiles:\n"+details.message,"error");
+    dashboardStock.textContent="Unexpected stockpile error: "+details.message;
+  }
+}
+function toggleRaw(){
+  rawVisible=!rawVisible;
+  document.getElementById("rawWrap").classList.toggle("hidden",!rawVisible);
 }
 
 async function refreshDashboard(){
-const checks=[["production_entries","productionCount"],["client_pickups","pickupCount"],["machine_breakdowns","breakdownCount"],["approval_requests","approvalCount"]];
-for(const [table,id] of checks){
-try{
-const {data,error}=await db.from(table).select("*").limit(500);
-if(error)throw error;
-if(table==="machine_breakdowns")$(id).textContent=data.filter(r=>!["resolved","closed","completed"].includes(String(r.status||"").toLowerCase())).length;
-else if(table==="approval_requests")$(id).textContent=data.filter(r=>String(r.status||"").toLowerCase()==="pending").length;
-else $(id).textContent=data.length;
-}catch(e){$(id).textContent="Error";}
-}
+  if(!currentUser)return;
+  const connection=document.getElementById("connectionMessage");
+  message(connection,"Connected as "+currentUser.email+". Checking dashboard tables...","info");
+  const checks=[
+    ["production_entries","metricProduction"],
+    ["client_pickups","metricPickups"],
+    ["machine_breakdowns","metricBreakdowns"],
+    ["approval_requests","metricApprovals"]
+  ];
+  const errors=[];
+  for(const [table,elementId] of checks){
+    const el=document.getElementById(elementId);
+    try{
+      const {data,error}=await db.from(table).select("*").limit(500);
+      if(error)throw error;
+      if(table==="machine_breakdowns"){
+        el.textContent=(data||[]).filter(r=>
+          !["resolved","closed","completed"].includes(String(r.status||"").toLowerCase())
+        ).length;
+      }else if(table==="approval_requests"){
+        el.textContent=(data||[]).filter(r=>
+          ["pending","awaiting approval","submitted"].includes(String(r.status||"pending").toLowerCase())
+        ).length;
+      }else{
+        el.textContent=(data||[]).length;
+      }
+    }catch(err){
+      el.textContent="Error";
+      errors.push(table+": "+err.message);
+    }
+  }
+  if(errors.length){
+    message(connection,"Some dashboard tables could not be read:\n"+errors.join("\n"),"error");
+  }else{
+    message(connection,"Connected. Dashboard tables loaded successfully.","success");
+  }
 }
 
-async function setSession(session){
-currentUser=session?session.user:null;
-$("login").classList.toggle("hidden",!!session);
-$("app").classList.toggle("hidden",!session);
-if(session){
-$("welcome").textContent="Signed in: "+(session.user.email||"Mine Manager");
-$("today").textContent=new Date().toLocaleString("en-ZA",{timeZone:"Africa/Johannesburg"});
-await refreshDashboard();
-showView("home");
-}
-}
-
-async function startApp(){
-if(!window.supabase){setStatus("loginMsg","Supabase did not load. Check your connection and refresh.");return;}
-try{
-db=window.supabase.createClient(SUPABASE_URL,SUPABASE_PUBLISHABLE_KEY);
-$("loginForm").onsubmit=async event=>{
-event.preventDefault();$("loginBtn").disabled=true;setStatus("loginMsg","Signing in...");
-try{
-const {data,error}=await db.auth.signInWithPassword({email:$("email").value.trim(),password:$("password").value});
-if(error)throw error;
-setStatus("loginMsg","");await setSession(data.session);
-}catch(e){setStatus("loginMsg","Sign in failed: "+e.message);}
-finally{$("loginBtn").disabled=false;}
-};
-$("navigation").addEventListener("click",event=>{
-const b=event.target.closest("button[data-view]");
-if(b)showView(b.dataset.view);
+document.getElementById("loginForm").addEventListener("submit",async event=>{
+  event.preventDefault();
+  const msg=document.getElementById("loginMessage");
+  message(msg,"Signing in...","info");
+  try{
+    const email=document.getElementById("email").value.trim();
+    const password=document.getElementById("password").value;
+    const {data,error}=await db.auth.signInWithPassword({email,password});
+    if(error)throw error;
+    currentUser=data.user;
+    await updateAuthUI();
+  }catch(err){
+    message(msg,"Sign-in failed: "+err.message,"error");
+  }
 });
-$("homeBtn").onclick=()=>showView("home");
-$("refreshBtn").onclick=refreshDashboard;
-$("reloadRecords").onclick=loadRecords;
-$("logoutBtn").onclick=async()=>{
-const {error}=await db.auth.signOut();
-if(error){setStatus("recordsMsg",error.message);return;}
-currentUser=null;$("app").classList.add("hidden");$("login").classList.remove("hidden");
-};
-const {data,error}=await db.auth.getSession();
-if(error)throw error;
-await setSession(data.session);
-}catch(e){setStatus("loginMsg","Startup error: "+e.message);}
+
+async function updateAuthUI(){
+  const login=document.getElementById("loginPanel");
+  const app=document.getElementById("app");
+  const authStatus=document.getElementById("authStatus");
+  const signOut=document.getElementById("signOutBtn");
+  if(currentUser){
+    login.classList.add("hidden");
+    app.classList.remove("hidden");
+    signOut.classList.remove("hidden");
+    authStatus.textContent="Signed in: "+currentUser.email;
+    Object.keys(configs).forEach(buildForm);
+    await refreshDashboard();
+    await loadStockpiles();
+    showPage("dashboard");
+  }else{
+    login.classList.remove("hidden");
+    app.classList.add("hidden");
+    signOut.classList.add("hidden");
+    authStatus.textContent="Not signed in";
+  }
 }
-startApp();
+
+document.getElementById("signOutBtn").addEventListener("click",async()=>{
+  const {error}=await db.auth.signOut();
+  if(error){alert("Sign-out failed: "+error.message);return;}
+  currentUser=null;
+  await updateAuthUI();
+});
+
+(async function init(){
+  try{
+    const {data,error}=await db.auth.getSession();
+    if(error)throw error;
+    currentUser=data.session?.user||null;
+    await updateAuthUI();
+  }catch(err){
+    document.getElementById("authStatus").textContent="Connection error: "+err.message;
+    message(document.getElementById("loginMessage"),err.message,"error");
+  }
+})();
 </script>
 </body>
 </html>
