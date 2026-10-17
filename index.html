@@ -8,31 +8,25 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
 :root {
-  --bg:#10151d;
-  --panel:#192230;
-  --panel2:#202c3b;
-  --text:#f4f7fb;
-  --muted:#aab6c6;
-  --blue:#2878f0;
-  --border:#344255;
-  --green:#26b879;
+  --bg:#10151d; --panel:#192230; --panel2:#202c3b;
+  --text:#f4f7fb; --muted:#aab6c6; --blue:#2878f0;
+  --border:#344255; --green:#26b879;
 }
 *{box-sizing:border-box}
 body{margin:0;background:var(--bg);color:var(--text);font-family:Arial,Helvetica,sans-serif}
 header{padding:18px 16px;background:#0b1017;border-bottom:2px solid var(--blue);position:sticky;top:0;z-index:5}
-.brand{font-size:21px;font-weight:800}
+.brand{font-size:22px;font-weight:800}
 .brand span{color:#4590ff}
 .subtitle,.muted{font-size:13px;color:var(--muted)}
 .subtitle{margin-top:5px}
 main{max-width:1150px;margin:auto;padding:16px}
-h1{font-size:25px}
 h2{font-size:21px;margin:8px 0 16px}
 h3{font-size:16px;margin:0 0 12px}
 .panel,.metric{background:var(--panel);border:1px solid var(--border);border-radius:13px;padding:16px;margin-bottom:15px}
 .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(145px,1fr));gap:12px;margin:16px 0}
-.metric{min-height:105px;margin:0}
+.metric{min-height:100px;margin:0}
 .metric-label{color:var(--muted);font-size:12px}
-.metric-value{font-size:27px;font-weight:800;margin-top:12px;overflow-wrap:anywhere}
+.metric-value{font-size:25px;font-weight:800;margin-top:12px;overflow-wrap:anywhere}
 button{border:0;border-radius:8px;padding:11px 14px;background:var(--blue);color:white;font-weight:700;cursor:pointer;font-size:14px}
 button:disabled{opacity:.55}
 button.secondary{background:var(--panel2);border:1px solid var(--border)}
@@ -40,7 +34,7 @@ nav{display:flex;gap:8px;overflow-x:auto;padding:12px 0 15px}
 nav button{white-space:nowrap;flex-shrink:0}
 nav button.active{background:white;color:#10151d}
 input,select,textarea{width:100%;background:#0e141c;color:var(--text);border:1px solid var(--border);border-radius:8px;padding:11px;margin-top:6px;font-size:15px}
-textarea{min-height:90px;resize:vertical}
+textarea{min-height:85px;resize:vertical}
 label{display:block;font-size:13px;color:var(--muted);margin-bottom:12px}
 .form-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:4px 12px}
 .actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
@@ -52,15 +46,15 @@ label{display:block;font-size:13px;color:var(--muted);margin-bottom:12px}
 .hidden{display:none!important}
 .list{display:grid;gap:10px}
 .record{background:#111923;border:1px solid var(--border);border-radius:9px;padding:12px;overflow-wrap:anywhere}
-.record-title{font-weight:700;margin-bottom:6px}
+.record-title{font-weight:700;margin-bottom:8px}
 footer{padding:22px;text-align:center;color:var(--muted);font-size:12px}
+.required{color:#ffb36b}
 </style>
 </head>
 <body>
-
 <header>
   <div class="brand">501 <span>MINING</span></div>
-  <div class="subtitle">Mine Manager Dashboard</div>
+  <div class="subtitle">Sand Mine Manager Dashboard</div>
 </header>
 
 <main>
@@ -91,7 +85,7 @@ footer{padding:22px;text-align:center;color:var(--muted);font-size:12px}
     </div>
 
     <nav id="navigation">
-      <button class="active" data-page="home">Stockpile Amount</button>
+      <button class="active" data-page="home">Stockpile</button>
       <button data-page="production">Production</button>
       <button data-page="pickups">Client pickups</button>
       <button data-page="hours">Machine hours</button>
@@ -106,9 +100,8 @@ footer{padding:22px;text-align:center;color:var(--muted);font-size:12px}
     </nav>
 
     <section id="page-home" class="page">
-      <h2>Stockpile Amount</h2>
-      <p class="muted">Live balance from your Supabase stockpile_balances view.</p>
-
+      <h2>Stockpile dashboard</h2>
+      <p class="muted">Stock balances are read from your Supabase database.</p>
       <div class="grid">
         <div class="metric">
           <div class="metric-label">Total sand stock</div>
@@ -131,16 +124,18 @@ footer{padding:22px;text-align:center;color:var(--muted);font-size:12px}
           <div id="approvalCount" class="metric-value">—</div>
         </div>
       </div>
-
       <div class="panel">
         <h3>Individual stockpiles</h3>
         <div id="stockpileList" class="list">Loading stockpiles...</div>
         <div id="stockpileMessage" class="status hidden"></div>
       </div>
-
       <div class="panel">
         <h3>Automatic stock control</h3>
-        <p class="muted">Production increases the selected sand stockpile. Client pickups decrease the selected sand stockpile. These changes are handled by the existing database triggers.</p>
+        <p class="muted">
+          Saving production should increase the selected sand stockpile.
+          Saving a client pickup should deduct the quantity collected.
+          Existing database triggers handle these changes.
+        </p>
       </div>
     </section>
 
@@ -170,158 +165,172 @@ const definitions = {
     table: "production_entries",
     title: "Production",
     fields: [
-      ["produced_at","Production date and time","datetime-local"],
-      ["material","Sand type","select",["Building Sand","Plaster Sand"]],
-      ["quantity_m3","Quantity (cubes)","number"]
+      ["produced_at","Production date and time","datetime-local",true],
+      ["material","Sand type","select",true,["Building Sand","Plaster Sand"]],
+      ["quantity_m3","Quantity produced (cubes)","number",true],
+      ["start_time","Start time","time"],
+      ["end_time","End time","time"],
+      ["machine_id","Machine","text"],
+      ["customer_or_destination","Destination / notes for customer","text"],
+      ["notes","Notes","textarea"]
     ]
   },
+
   pickups: {
     table: "client_pickups",
     title: "Client pickups",
     fields: [
-      ["collected_at","Pickup date and time","datetime-local"],
-      ["material","Sand type","select",["Building Sand","Plaster Sand"]],
-      ["quantity_m3","Quantity collected (cubes)","number"]
+      ["collected_at","Pickup date and time","datetime-local",true],
+      ["client_name","Client name","text",true],
+      ["material","Sand type","select",true,["Building Sand","Plaster Sand"]],
+      ["quantity_m3","Quantity collected (cubes)","number",true],
+      ["truck_registration","Truck registration","text"],
+      ["delivery_note_number","Delivery note number","text"],
+      ["notes","Notes","textarea"]
     ]
   },
+
   hours: {
     table: "daily_machine_hours",
     title: "Machine hours",
     fields: [
-      ["work_date","Work date","date"],
-      ["machine_name","Machine","text"],
-      ["start_hours","Starting hours","number"],
-      ["end_hours","Ending hours","number"],
+      ["work_date","Work date","date",true],
+      ["machine_name","Machine","text",true],
+      ["start_hours","Starting hours","number",true],
+      ["end_hours","Ending hours","number",true],
       ["hours_worked","Hours worked","number"],
       ["operator","Operator","text"],
       ["notes","Notes","textarea"]
     ]
   },
+
   breakdowns: {
     table: "machine_breakdowns",
     title: "Breakdowns",
     fields: [
-      ["breakdown_date","Breakdown date","date"],
-      ["machine_name","Machine","text"],
-      ["problem","Problem / fault","textarea"],
+      ["breakdown_date","Breakdown date","date",true],
+      ["machine_name","Machine","text",true],
+      ["problem","Problem / fault","textarea",true],
       ["action_taken","Action taken","textarea"],
       ["downtime_hours","Downtime (hours)","number"],
-      ["status","Status","select",["Open","In progress","Completed"]],
+      ["status","Status","select",true,["Open","In progress","Completed"]],
       ["notes","Notes","textarea"]
     ]
   },
+
   jobs: {
     table: "job_cards",
     title: "Job cards",
     fields: [
-      ["job_date","Job date","date"],
-      ["machine_name","Machine","text"],
-      ["job_description","Job description","textarea"],
-      ["priority","Priority","select",["Low","Normal","High","Urgent"]],
+      ["job_date","Job date","date",true],
+      ["machine_name","Machine","text",true],
+      ["job_description","Job description","textarea",true],
+      ["priority","Priority","select",true,["Low","Normal","High","Urgent"]],
       ["assigned_to","Assigned to","text"],
-      ["status","Status","select",["Open","In progress","Completed"]],
+      ["status","Status","select",true,["Open","In progress","Completed"]],
       ["parts_required","Parts required","textarea"],
       ["notes","Notes","textarea"]
     ]
   },
+
   diesel: {
     table: "diesel_logs",
     title: "Diesel",
     fields: [
-      ["log_date","Date","date"],
-      ["machine_name","Machine","text"],
-      ["litres","Litres","number"],
+      ["log_date","Date","date",true],
+      ["machine_name","Machine","text",true],
+      ["litres","Litres","number",true],
       ["cost","Cost (R)","number"],
       ["supplied_by","Supplied by","text"],
       ["notes","Notes","textarea"]
     ]
   },
+
   maintenance: {
     table: "maintenance_records",
     title: "Maintenance",
     fields: [
-      ["maintenance_date","Maintenance date","date"],
-      ["machine_name","Machine","text"],
-      ["maintenance_type","Maintenance type","text"],
-      ["description","Work completed / required","textarea"],
+      ["maintenance_date","Maintenance date","date",true],
+      ["machine_name","Machine","text",true],
+      ["maintenance_type","Maintenance type","text",true],
+      ["description","Work completed / required","textarea",true],
       ["next_service_hours","Next service hours","number"],
-      ["status","Status","select",["Planned","In progress","Completed"]],
+      ["status","Status","select",true,["Planned","In progress","Completed"]],
       ["notes","Notes","textarea"]
     ]
   },
+
   duties: {
     table: "staff_duties",
     title: "Staff duties",
     fields: [
-      ["duty_date","Date","date"],
-      ["staff_name","Staff member","text"],
-      ["duty","Duty / task","textarea"],
-      ["status","Status","select",["Assigned","In progress","Completed"]],
+      ["duty_date","Date","date",true],
+      ["staff_name","Staff member","text",true],
+      ["duty","Duty / task","textarea",true],
+      ["status","Status","select",true,["Assigned","In progress","Completed"]],
       ["notes","Notes","textarea"]
     ]
   },
+
   safety: {
     table: "safety_inspections",
     title: "Safety inspections",
     fields: [
-      ["inspection_date","Inspection date","date"],
-      ["area_or_machine","Area / machine","text"],
-      ["inspector","Inspector","text"],
-      ["findings","Findings","textarea"],
+      ["inspection_date","Inspection date","date",true],
+      ["area_or_machine","Area / machine","text",true],
+      ["inspector","Inspector","text",true],
+      ["findings","Findings","textarea",true],
       ["corrective_action","Corrective action","textarea"],
-      ["status","Status","select",["Pass","Action required","Completed"]],
+      ["status","Status","select",true,["Pass","Action required","Completed"]],
       ["notes","Notes","textarea"]
     ]
   },
+
   approvals: {
     table: "approval_requests",
     title: "Approval requests",
     fields: [
-      ["request_date","Request date","date"],
-      ["requested_by","Requested by","text"],
-      ["request_type","Request type","text"],
-      ["description","Request details","textarea"],
+      ["request_date","Request date","date",true],
+      ["requested_by","Requested by","text",true],
+      ["request_type","Request type","text",true],
+      ["description","Request details","textarea",true],
       ["amount","Amount (R)","number"],
-      ["status","Status","select",["Pending","Approved","Rejected"]],
+      ["status","Status","select",true,["Pending","Approved","Rejected"]],
       ["reviewed_by","Reviewed by","text"],
       ["review_notes","Review notes","textarea"]
     ]
   },
+
   reports: {
     table: "daily_whatsapp_report",
     title: "Daily WhatsApp reports",
     fields: [
-      ["report_date","Report date","date"],
-      ["report_text","Report text","textarea"],
-      ["status","Status","select",["Draft","Ready to send","Sent"]],
+      ["report_date","Report date","date",true],
+      ["report_text","Report text","textarea",true],
+      ["status","Status","select",true,["Draft","Ready to send","Sent"]],
       ["created_by","Created by","text"]
     ]
   }
 };
 
 const $ = id => document.getElementById(id);
-const today = () => new Date().toISOString().slice(0,10);
-
-function localDateTime() {
+const today = () => {
+  const d = new Date();
+  d.setMinutes(d.getMinutes() - d.getTimezoneOffset());
+  return d.toISOString().slice(0,10);
+};
+const localDateTime = () => {
   const d = new Date();
   d.setMinutes(d.getMinutes() - d.getTimezoneOffset());
   return d.toISOString().slice(0,16);
-}
+};
 
-function showMessage(target,message,type="info") {
-  target.textContent = message;
-  target.className = "status " + type;
-  target.classList.remove("hidden");
-}
-function hideMessage(target) {
-  target.textContent = "";
-  target.classList.add("hidden");
-}
 function safeText(value) {
   return String(value ?? "").replace(/[&<>"']/g,c=>({
     "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"
   })[c]);
 }
+
 function numberText(value) {
   const n = Number(value);
   return Number.isFinite(n)
@@ -329,30 +338,39 @@ function numberText(value) {
     : "—";
 }
 
+function showMessage(target,message,type="info") {
+  target.textContent = message;
+  target.className = "status " + type;
+}
+function hideMessage(target) {
+  target.textContent = "";
+  target.className = "status hidden";
+}
+
 function makeField(field,index,prefix) {
-  const [name,label,type,options] = field;
+  const [name,label,type,required,options] = field;
   const id = prefix + "_" + index;
+  const requiredAttr = required ? " required" : "";
+  const labelText = safeText(label) +
+    (required ? ' <span class="required">*</span>' : "");
   let control = "";
 
   if (type === "textarea") {
-    control = `<textarea id="${id}" name="${name}"></textarea>`;
+    control = `<textarea id="${id}" name="${name}"${requiredAttr}></textarea>`;
   } else if (type === "select") {
-    control = `<select id="${id}" name="${name}" required>
+    control = `<select id="${id}" name="${name}"${requiredAttr}>
       <option value="">Choose an option</option>
       ${options.map(o=>`<option value="${safeText(o)}">${safeText(o)}</option>`).join("")}
     </select>`;
   } else {
-    const value = type === "date"
-      ? ` value="${today()}"`
-      : type === "datetime-local"
-        ? ` value="${localDateTime()}"`
-        : "";
+    let value = "";
+    if (type === "date") value = ` value="${today()}"`;
+    if (type === "datetime-local") value = ` value="${localDateTime()}"`;
     const step = type === "number" ? ' step="any" min="0"' : "";
-    const required = ["date","datetime-local","number"].includes(type) ? " required" : "";
-    control = `<input id="${id}" name="${name}" type="${type}"${value}${step}${required}>`;
+    control = `<input id="${id}" name="${name}" type="${type}"${value}${step}${requiredAttr}>`;
   }
 
-  return `<label>${safeText(label)}${control}</label>`;
+  return `<label for="${id}">${labelText}${control}</label>`;
 }
 
 function buildSection(key,config) {
@@ -398,23 +416,31 @@ async function saveRecord(event,key,config) {
   const button = form.querySelector('button[type="submit"]');
   const payload = {};
 
-  for (const [name,label,type] of config.fields) {
+  for (const [name,label,type,required] of config.fields) {
     const control = form.elements.namedItem(name);
     if (!control) continue;
+
     const raw = control.value.trim();
+
+    if (required && raw === "") {
+      showMessage(message,"Please complete the required field: " + label,"warn");
+      control.focus();
+      return;
+    }
     if (raw === "") continue;
 
     if (type === "number") {
       const n = Number(raw);
       if (!Number.isFinite(n) || n < 0) {
-        showMessage(message,`Enter a valid quantity for ${label}.`,"warn");
+        showMessage(message,"Enter a valid non-negative number for " + label,"warn");
+        control.focus();
         return;
       }
       payload[name] = n;
     } else if (type === "datetime-local") {
       const date = new Date(raw);
       if (Number.isNaN(date.getTime())) {
-        showMessage(message,`Please select a valid date and time for ${label}.`,"warn");
+        showMessage(message,"Select a valid date and time for " + label,"warn");
         return;
       }
       payload[name] = date.toISOString();
@@ -423,9 +449,13 @@ async function saveRecord(event,key,config) {
     }
   }
 
-  if (!Object.keys(payload).length) {
-    showMessage(message,"Please complete the form before saving.","warn");
-    return;
+  // Save the signed-in user's email when the table supports this text field.
+  // The dashboard does not send any service-role key to the browser.
+  const {data:authData} = await db.auth.getUser();
+  const user = authData?.user;
+
+  if (user && ["production_entries","client_pickups","stockpile_movements"].includes(config.table)) {
+    payload.entered_by = user.email || user.id;
   }
 
   button.disabled = true;
@@ -444,7 +474,7 @@ async function saveRecord(event,key,config) {
     showMessage(message,
       "Could not save to " + config.table + ".\n" +
       (error.message || String(error)) +
-      "\n\nThe database column names or permissions may not match this form.",
+      "\n\nCheck the table columns and Supabase permissions. If the error mentions row-level security, the table's INSERT policy must allow your signed-in account.",
       "error");
   } finally {
     button.disabled = false;
@@ -457,7 +487,11 @@ async function loadRecords(key,config) {
   container.textContent = "Loading records...";
 
   try {
-    const {data,error} = await db.from(config.table).select("*").limit(20);
+    const {data,error} = await db
+      .from(config.table)
+      .select("*")
+      .limit(20);
+
     if (error) throw error;
 
     if (!data || data.length === 0) {
@@ -468,11 +502,23 @@ async function loadRecords(key,config) {
     container.innerHTML = data.map((row,index)=>{
       const entries = Object.entries(row)
         .filter(([name])=>name !== "id")
-        .slice(0,10)
+        .slice(0,14)
         .map(([name,value])=>
           `<div><span class="muted">${safeText(name.replaceAll("_"," "))}:</span> ${safeText(value)}</div>`
         ).join("");
-      return `<div class="record"><div class="record-title">Record ${index+1}</div>${entries}</div>`;
+
+      const title = row.client_name
+        ? "Client: " + row.client_name
+        : row.machine_name
+          ? row.machine_name
+          : row.material
+            ? row.material
+            : "Record " + (index+1);
+
+      return `<div class="record">
+        <div class="record-title">${safeText(title)}</div>
+        ${entries}
+      </div>`;
     }).join("");
   } catch (error) {
     container.innerHTML = "";
@@ -549,8 +595,7 @@ async function loadStockpile() {
     list.innerHTML = "";
     showMessage(message,
       "Could not load stockpile balances.\n" +
-      (error.message || String(error)),
-      "error");
+      (error.message || String(error)),"error");
   }
 }
 
@@ -569,6 +614,7 @@ async function countRows(table,elementId,filterFn) {
 
 async function refreshDashboard() {
   await loadStockpile();
+
   await Promise.all([
     countRows("production_entries","productionCount"),
     countRows("client_pickups","pickupCount"),
@@ -601,6 +647,7 @@ document.querySelectorAll("#navigation button").forEach(button=>{
 });
 
 async function showApp(session) {
+  if (!session) return;
   $("loginPanel").classList.add("hidden");
   $("appPanel").classList.remove("hidden");
   $("userEmail").textContent = session.user.email || "Signed in";
@@ -630,9 +677,7 @@ $("loginForm").addEventListener("submit",async event=>{
     if (error) throw error;
     await showApp(data.session);
   } catch (error) {
-    showMessage(message,
-      "Login failed: " + (error.message || String(error)),
-      "error");
+    showMessage(message,"Login failed: " + (error.message || String(error)),"error");
   } finally {
     button.disabled = false;
     button.textContent = "Sign in";
@@ -641,19 +686,21 @@ $("loginForm").addEventListener("submit",async event=>{
 
 $("logoutButton").addEventListener("click",async()=>{
   const {error} = await db.auth.signOut();
-  if (error) showGlobal(error.message,"error");
+  if (error) showMessage($("globalMessage"),error.message,"error");
   else showLogin();
 });
 
 $("refreshButton").addEventListener("click",async()=>{
-  showGlobal("Refreshing dashboard...","info");
+  showMessage($("globalMessage"),"Refreshing dashboard...","info");
   await refreshDashboard();
-  showGlobal("Refresh completed. Check for any warnings on the page.","ok");
+  showMessage($("globalMessage"),"Refresh completed. Check for warnings on the page.","ok");
 });
 
 db.auth.onAuthStateChange((event,session)=>{
   if (session) {
-    showApp(session);
+    $("loginPanel").classList.add("hidden");
+    $("appPanel").classList.remove("hidden");
+    $("userEmail").textContent = session.user.email || "Signed in";
   } else {
     showLogin();
   }
@@ -668,8 +715,7 @@ db.auth.onAuthStateChange((event,session)=>{
   } catch (error) {
     showMessage($("loginMessage"),
       "Could not connect to Supabase.\n" +
-      (error.message || String(error)),
-      "error");
+      (error.message || String(error)),"error");
   }
 })();
 </script>
