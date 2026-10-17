@@ -7,270 +7,159 @@
 <meta name="theme-color" content="#10151d">
 <title>501 Mining | Mine Manager</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
 <style>
-:root {
-  --bg:#10151d;
-  --panel:#192230;
-  --panel2:#202c3b;
-  --text:#f4f7fb;
-  --muted:#aab6c6;
-  --blue:#2878f0;
-  --border:#344255;
-  --green:#26b879;
-}
-* { box-sizing:border-box; }
-body {
-  margin:0;
-  background:var(--bg);
-  color:var(--text);
-  font-family:Arial,Helvetica,sans-serif;
-}
-header {
-  padding:17px;
-  background:#0b1017;
-  border-bottom:2px solid var(--blue);
-  position:sticky;
-  top:0;
-  z-index:5;
-}
-.brand { font-size:23px;font-weight:800; }
-.brand span { color:#4590ff; }
-.subtitle,.muted { color:var(--muted);font-size:13px; }
-.subtitle { margin-top:5px; }
-main { max-width:1200px;margin:auto;padding:15px; }
-h2 { font-size:21px;margin:8px 0 15px; }
-h3 { font-size:16px;margin:0 0 12px; }
-.panel,.metric {
-  background:var(--panel);
-  border:1px solid var(--border);
-  border-radius:12px;
-  padding:15px;
-  margin-bottom:14px;
-}
-.grid {
-  display:grid;
-  grid-template-columns:repeat(auto-fit,minmax(145px,1fr));
-  gap:12px;
-  margin:14px 0;
-}
-.metric { margin:0;min-height:105px; }
-.metric-label { font-size:12px;color:var(--muted);letter-spacing:.3px; }
-.metric-value {
-  font-size:25px;
-  font-weight:800;
-  margin-top:12px;
-  overflow-wrap:anywhere;
-}
-.stock-value { color:#76b1ff; }
-.production-value { color:#5ee0a4; }
-nav {
-  display:flex;
-  gap:8px;
-  overflow-x:auto;
-  padding:12px 0 15px;
-}
-nav button { white-space:nowrap;flex-shrink:0; }
-button {
-  border:0;
-  border-radius:8px;
-  padding:11px 14px;
-  background:var(--blue);
-  color:white;
-  font-weight:700;
-  cursor:pointer;
-  font-size:14px;
-}
-button:disabled { opacity:.55; }
-button.secondary {
-  background:var(--panel2);
-  border:1px solid var(--border);
-}
-nav button.active { background:white;color:#10151d; }
-input,select,textarea {
-  width:100%;
-  background:#0e141c;
-  color:var(--text);
-  border:1px solid var(--border);
-  border-radius:8px;
-  padding:11px;
-  margin-top:6px;
-  font-size:15px;
-}
-textarea { min-height:80px;resize:vertical; }
-label {
-  display:block;
-  font-size:13px;
-  color:var(--muted);
-  margin-bottom:12px;
-}
-.form-grid {
-  display:grid;
-  grid-template-columns:repeat(auto-fit,minmax(210px,1fr));
-  gap:4px 12px;
-}
-.actions {
-  display:flex;
-  gap:8px;
-  flex-wrap:wrap;
-  margin-top:8px;
-}
-.status {
-  padding:11px;
-  border-radius:8px;
-  margin:10px 0;
-  white-space:pre-wrap;
-  overflow-wrap:anywhere;
-}
-.info { background:#1d3550; }
-.ok { background:#123d2e; }
-.error { background:#4b2024; }
-.warn { background:#4a351c; }
-.hidden { display:none!important; }
-.list { display:grid;gap:10px; }
-.record {
-  background:#111923;
-  border:1px solid var(--border);
-  border-radius:9px;
-  padding:12px;
-  overflow-wrap:anywhere;
-}
-.record-title { font-weight:700;margin-bottom:8px; }
-.required { color:#ffb36b; }
-footer {
-  text-align:center;
-  padding:22px;
-  color:var(--muted);
-  font-size:12px;
-}
+:root{--bg:#10151d;--panel:#192230;--panel2:#202c3b;--text:#f4f7fb;--muted:#aab6c6;--blue:#2878f0;--border:#344255;--green:#26b879}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);font-family:Arial,Helvetica,sans-serif}
+header{padding:17px;background:#0b1017;border-bottom:2px solid var(--blue);position:sticky;top:0;z-index:5}
+.brand{font-size:23px;font-weight:800}
+.brand span{color:#4590ff}
+.subtitle,.muted{color:var(--muted);font-size:13px}
+.subtitle{margin-top:5px}
+main{max-width:1200px;margin:auto;padding:15px}
+h2{font-size:21px;margin:8px 0 15px}
+h3{font-size:16px;margin:0 0 12px}
+.panel,.metric{background:var(--panel);border:1px solid var(--border);border-radius:12px;padding:15px;margin-bottom:14px}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(145px,1fr));gap:12px;margin:14px 0}
+.metric{margin:0;min-height:105px}
+.metric-label{font-size:12px;color:var(--muted);letter-spacing:.3px}
+.metric-value{font-size:25px;font-weight:800;margin-top:12px;overflow-wrap:anywhere}
+.stock-value{color:#76b1ff}
+.production-value{color:#5ee0a4}
+nav{display:flex;gap:8px;overflow-x:auto;padding:12px 0 15px}
+nav button{white-space:nowrap;flex-shrink:0}
+button{border:0;border-radius:8px;padding:11px 14px;background:var(--blue);color:white;font-weight:700;cursor:pointer;font-size:14px}
+button:disabled{opacity:.55}
+button.secondary{background:var(--panel2);border:1px solid var(--border)}
+nav button.active{background:white;color:#10151d}
+input,select,textarea{width:100%;background:#0e141c;color:var(--text);border:1px solid var(--border);border-radius:8px;padding:11px;margin-top:6px;font-size:15px}
+textarea{min-height:80px;resize:vertical}
+label{display:block;font-size:13px;color:var(--muted);margin-bottom:12px}
+.form-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:4px 12px}
+.actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
+.status{padding:11px;border-radius:8px;margin:10px 0;white-space:pre-wrap;overflow-wrap:anywhere}
+.info{background:#1d3550}
+.ok{background:#123d2e}
+.error{background:#4b2024}
+.warn{background:#4a351c}
+.hidden{display:none!important}
+.list{display:grid;gap:10px}
+.record{background:#111923;border:1px solid var(--border);border-radius:9px;padding:12px;overflow-wrap:anywhere}
+.record-title{font-weight:700;margin-bottom:8px}
+.required{color:#ffb36b}
+footer{text-align:center;padding:22px;color:var(--muted);font-size:12px}
+a{color:#82b8ff;overflow-wrap:anywhere}
+.file-note{font-size:12px;color:var(--muted);margin-top:-6px;margin-bottom:12px}
 </style>
 </head>
-
 <body>
 <header>
-  <div class="brand">501 <span>MINING</span></div>
-  <div class="subtitle">Sand Mine Manager Dashboard</div>
+<div class="brand">501 <span>MINING</span></div>
+<div class="subtitle">Sand Mine Manager Dashboard</div>
 </header>
-
 <main>
 <section id="loginPanel" class="panel">
-  <h2>Manager Login</h2>
-  <p class="muted">Sign in using your existing Supabase account.</p>
-  <form id="loginForm">
-    <label>Email address
-      <input id="email" type="email" autocomplete="username" required>
-    </label>
-    <label>Password
-      <input id="password" type="password" autocomplete="current-password" required>
-    </label>
-    <button id="loginButton" type="submit">Sign in</button>
-  </form>
-  <div id="loginMessage" class="status hidden"></div>
+<h2>Manager Login</h2>
+<p class="muted">Sign in using your existing Supabase account.</p>
+<form id="loginForm">
+<label>Email address<input id="email" type="email" autocomplete="username" required></label>
+<label>Password<input id="password" type="password" autocomplete="current-password" required></label>
+<button id="loginButton" type="submit">Sign in</button>
+</form>
+<div id="loginMessage" class="status hidden"></div>
 </section>
 
 <section id="appPanel" class="hidden">
-  <div class="panel">
-    <div class="muted">SIGNED-IN ACCOUNT</div>
-    <div id="userEmail" style="margin:6px 0;font-weight:700"></div>
-    <div class="actions">
-      <button id="refreshButton" class="secondary" type="button">Refresh dashboard</button>
-      <button id="logoutButton" class="secondary" type="button">Sign out</button>
-    </div>
-    <div id="globalMessage" class="status hidden"></div>
-  </div>
+<div class="panel">
+<div class="muted">SIGNED-IN ACCOUNT</div>
+<div id="userEmail" style="margin:6px 0;font-weight:700"></div>
+<div class="actions">
+<button id="refreshButton" class="secondary" type="button">Refresh dashboard</button>
+<button id="logoutButton" class="secondary" type="button">Sign out</button>
+</div>
+<div id="globalMessage" class="status hidden"></div>
+</div>
 
-  <nav id="navigation">
-    <button class="active" data-page="home">Home</button>
-    <button data-page="production">Production</button>
-    <button data-page="pickups">Client pickups</button>
-    <button data-page="hours">Machine hours</button>
-    <button data-page="breakdowns">Breakdowns</button>
-    <button data-page="jobs">Job cards</button>
-    <button data-page="diesel">Diesel</button>
-    <button data-page="maintenance">Maintenance</button>
-    <button data-page="duties">Staff duties</button>
-    <button data-page="safety">DMRE Inspection</button>
-    <button data-page="approvals">Approvals</button>
-    <button data-page="reports">Daily reports</button>
-  </nav>
+<nav id="navigation">
+<button class="active" data-page="home">Home</button>
+<button data-page="production">Production</button>
+<button data-page="pickups">Client pickups</button>
+<button data-page="hours">Machine hours</button>
+<button data-page="breakdowns">Breakdowns</button>
+<button data-page="jobs">Job cards</button>
+<button data-page="diesel">Diesel</button>
+<button data-page="maintenance">Maintenance</button>
+<button data-page="duties">Staff duties</button>
+<button data-page="safety">DMRE inspections</button>
+<button data-page="dmre">DMRE reports</button>
+<button data-page="approvals">Approvals</button>
+<button data-page="reports">Daily reports</button>
+</nav>
 
-  <section id="page-home" class="page">
-    <h2>Mine Overview</h2>
-    <p class="muted" id="dashboardDate">Today's production and available stock</p>
+<section id="page-home" class="page">
+<h2>Mine Overview</h2>
+<p class="muted" id="dashboardDate">Today's production and available stock</p>
+<div class="grid">
+<div class="metric">
+<div class="metric-label">BUILDING SAND STOCK</div>
+<div id="buildingStock" class="metric-value stock-value">—</div>
+<div class="muted">Cubes currently available</div>
+</div>
+<div class="metric">
+<div class="metric-label">PLASTER SAND STOCK</div>
+<div id="plasterStock" class="metric-value stock-value">—</div>
+<div class="muted">Cubes currently available</div>
+</div>
+<div class="metric">
+<div class="metric-label">BUILDING SAND TODAY</div>
+<div id="buildingProduced" class="metric-value production-value">—</div>
+<div class="muted">Cubes produced today</div>
+</div>
+<div class="metric">
+<div class="metric-label">PLASTER SAND TODAY</div>
+<div id="plasterProduced" class="metric-value production-value">—</div>
+<div class="muted">Cubes produced today</div>
+</div>
+</div>
 
-    <div class="grid">
-      <div class="metric">
-        <div class="metric-label">BUILDING SAND STOCK</div>
-        <div id="buildingStock" class="metric-value stock-value">—</div>
-        <div class="muted">Cubes currently available</div>
-      </div>
-      <div class="metric">
-        <div class="metric-label">PLASTER SAND STOCK</div>
-        <div id="plasterStock" class="metric-value stock-value">—</div>
-        <div class="muted">Cubes currently available</div>
-      </div>
-      <div class="metric">
-        <div class="metric-label">BUILDING SAND TODAY</div>
-        <div id="buildingProduced" class="metric-value production-value">—</div>
-        <div class="muted">Cubes produced today</div>
-      </div>
-      <div class="metric">
-        <div class="metric-label">PLASTER SAND TODAY</div>
-        <div id="plasterProduced" class="metric-value production-value">—</div>
-        <div class="muted">Cubes produced today</div>
-      </div>
-    </div>
+<div class="panel">
+<div class="metric-label">TOTAL SAND PRODUCED TODAY</div>
+<div id="totalProduced" class="metric-value production-value">—</div>
+<p class="muted">Daily production is counted separately from client pickups.</p>
+<div id="productionStatus" class="status hidden"></div>
+</div>
 
-    <div class="panel">
-      <div class="metric-label">TOTAL SAND PRODUCED TODAY</div>
-      <div id="totalProduced" class="metric-value production-value">—</div>
-      <p class="muted">Daily production is counted separately from client pickups.</p>
-      <div id="productionStatus" class="status hidden"></div>
-    </div>
+<div class="panel">
+<h3>Daily activity</h3>
+<div class="grid">
+<div class="metric"><div class="metric-label">PRODUCTION ENTRIES</div><div id="productionCount" class="metric-value">—</div></div>
+<div class="metric"><div class="metric-label">CLIENT PICKUPS</div><div id="pickupCount" class="metric-value">—</div></div>
+<div class="metric"><div class="metric-label">OPEN BREAKDOWNS</div><div id="breakdownCount" class="metric-value">—</div></div>
+<div class="metric"><div class="metric-label">PENDING APPROVALS</div><div id="approvalCount" class="metric-value">—</div></div>
+</div>
+</div>
 
-    <div class="panel">
-      <h3>Daily activity</h3>
-      <div class="grid">
-        <div class="metric">
-          <div class="metric-label">PRODUCTION ENTRIES</div>
-          <div id="productionCount" class="metric-value">—</div>
-        </div>
-        <div class="metric">
-          <div class="metric-label">CLIENT PICKUPS</div>
-          <div id="pickupCount" class="metric-value">—</div>
-        </div>
-        <div class="metric">
-          <div class="metric-label">OPEN BREAKDOWNS</div>
-          <div id="breakdownCount" class="metric-value">—</div>
-        </div>
-        <div class="metric">
-          <div class="metric-label">PENDING APPROVALS</div>
-          <div id="approvalCount" class="metric-value">—</div>
-        </div>
-      </div>
-    </div>
+<div class="panel">
+<h3>Stockpile details</h3>
+<div id="stockpileList" class="list">Loading stockpiles...</div>
+<div id="stockpileMessage" class="status hidden"></div>
+</div>
+</section>
 
-    <div class="panel">
-      <h3>Stockpile details</h3>
-      <div id="stockpileList" class="list">Loading stockpiles...</div>
-      <div id="stockpileMessage" class="status hidden"></div>
-    </div>
-  </section>
-
-  <section id="page-production" class="page hidden"></section>
-  <section id="page-pickups" class="page hidden"></section>
-  <section id="page-hours" class="page hidden"></section>
-  <section id="page-breakdowns" class="page hidden"></section>
-  <section id="page-jobs" class="page hidden"></section>
-  <section id="page-diesel" class="page hidden"></section>
-  <section id="page-maintenance" class="page hidden"></section>
-  <section id="page-duties" class="page hidden"></section>
-  <section id="page-safety" class="page hidden"></section>
-  <section id="page-approvals" class="page hidden"></section>
-  <section id="page-reports" class="page hidden"></section>
+<section id="page-production" class="page hidden"></section>
+<section id="page-pickups" class="page hidden"></section>
+<section id="page-hours" class="page hidden"></section>
+<section id="page-breakdowns" class="page hidden"></section>
+<section id="page-jobs" class="page hidden"></section>
+<section id="page-diesel" class="page hidden"></section>
+<section id="page-maintenance" class="page hidden"></section>
+<section id="page-duties" class="page hidden"></section>
+<section id="page-safety" class="page hidden"></section>
+<section id="page-dmre" class="page hidden"></section>
+<section id="page-approvals" class="page hidden"></section>
+<section id="page-reports" class="page hidden"></section>
 </section>
 </main>
-
 <footer>501 Mining · Mine Manager System</footer>
 
 <script>
@@ -278,31 +167,40 @@ footer {
 
 const SUPABASE_URL = "https://guintqihzpecbjvdgtdg.supabase.co";
 const SUPABASE_KEY = "sb_publishable_ts9yQRmjpbnmxFAtukasYQ_7nacpxta";
+const DMRE_BUCKET = "dmre-reports";
+const MAX_REPORT_BYTES = 20 * 1024 * 1024;
+const ALLOWED_REPORT_TYPES = [
+  "application/pdf",
+  "image/jpeg",
+  "image/png",
+  "image/webp",
+  "application/msword",
+  "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+];
 const db = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
+// Bobcat 753 removed from all machine selections.
 const machines = [
   "Caterpillar 416D TLB",
   "Mercedes-Benz Axor 3335 Truck",
-  "Bobcat 753",
   "Other machine / vehicle"
 ];
 
 const definitions = {
   production: {
-    table:"production_entries",
-    title:"Production",
-    fields:[
+    table: "production_entries",
+    title: "Production",
+    fields: [
       ["produced_at","Production date and time","datetime-local",true],
       ["material","Sand type","select",true,["Building Sand","Plaster Sand"]],
       ["quantity_m3","Quantity produced (cubes)","number",true],
       ["notes","Notes","textarea"]
     ]
   },
-
   pickups: {
-    table:"client_pickups",
-    title:"Client pickups",
-    fields:[
+    table: "client_pickups",
+    title: "Client pickups",
+    fields: [
       ["collected_at","Pickup date and time","datetime-local",true],
       ["client_name","Client name","text",true],
       ["material","Sand type","select",true,["Building Sand","Plaster Sand"]],
@@ -312,11 +210,10 @@ const definitions = {
       ["notes","Notes","textarea"]
     ]
   },
-
   hours: {
-    table:"daily_machine_hours",
-    title:"Machine hours",
-    fields:[
+    table: "daily_machine_hours",
+    title: "Machine hours",
+    fields: [
       ["work_date","Work date","date",true],
       ["machine_name","Machine","machine",true],
       ["start_hours","Starting hours","number",true],
@@ -326,11 +223,10 @@ const definitions = {
       ["notes","Notes","textarea"]
     ]
   },
-
   breakdowns: {
-    table:"machine_breakdowns",
-    title:"Breakdowns",
-    fields:[
+    table: "machine_breakdowns",
+    title: "Breakdowns",
+    fields: [
       ["breakdown_date","Breakdown date","date",true],
       ["machine_name","Machine","machine",true],
       ["problem","Problem / fault","textarea",true],
@@ -340,11 +236,10 @@ const definitions = {
       ["notes","Notes","textarea"]
     ]
   },
-
   jobs: {
-    table:"job_cards",
-    title:"Job cards",
-    fields:[
+    table: "job_cards",
+    title: "Job cards",
+    fields: [
       ["job_date","Job date","date",true],
       ["machine_name","Machine","machine",true],
       ["job_description","Job description","textarea",true],
@@ -355,11 +250,10 @@ const definitions = {
       ["notes","Notes","textarea"]
     ]
   },
-
   diesel: {
-    table:"diesel_logs",
-    title:"Diesel",
-    fields:[
+    table: "diesel_logs",
+    title: "Diesel",
+    fields: [
       ["log_date","Date","date",true],
       ["machine_name","Machine / vehicle","machine",true],
       ["litres","Litres issued","number",true],
@@ -368,11 +262,10 @@ const definitions = {
       ["notes","Notes","textarea"]
     ]
   },
-
   maintenance: {
-    table:"maintenance_records",
-    title:"Maintenance",
-    fields:[
+    table: "maintenance_records",
+    title: "Maintenance",
+    fields: [
       ["maintenance_date","Maintenance date","date",true],
       ["machine_name","Machine","machine",true],
       ["maintenance_type","Maintenance type","text",true],
@@ -382,11 +275,10 @@ const definitions = {
       ["notes","Notes","textarea"]
     ]
   },
-
   duties: {
-    table:"staff_duties",
-    title:"Staff duties",
-    fields:[
+    table: "staff_duties",
+    title: "Staff duties",
+    fields: [
       ["duty_date","Date","date",true],
       ["staff_name","Staff member","text",true],
       ["duty","Duty / task","textarea",true],
@@ -394,30 +286,23 @@ const definitions = {
       ["notes","Notes","textarea"]
     ]
   },
-
   safety: {
-    table:"safety_inspections",
-    title:"DMRE Inspection",
-    fields:[
+    table: "safety_inspections",
+    title: "DMRE inspections",
+    fields: [
       ["inspection_date","Inspection date","date",true],
       ["area_or_machine","Inspection area / machine","text",true],
       ["inspector","Inspector / competent person","text",true],
       ["findings","Inspection findings","textarea",true],
       ["corrective_action","Required corrective action","textarea",true],
-      ["status","Compliance status","select",true,[
-        "Compliant",
-        "Non-compliant",
-        "Action required",
-        "Completed"
-      ]],
+      ["status","Compliance status","select",true,["Compliant","Non-compliant","Action required","Completed"]],
       ["notes","Additional notes","textarea"]
     ]
   },
-
   approvals: {
-    table:"approval_requests",
-    title:"Approval requests",
-    fields:[
+    table: "approval_requests",
+    title: "Approval requests",
+    fields: [
       ["request_date","Request date","date",true],
       ["requested_by","Requested by","text",true],
       ["request_type","Request type","text",true],
@@ -428,11 +313,10 @@ const definitions = {
       ["review_notes","Review notes","textarea"]
     ]
   },
-
   reports: {
-    table:"daily_whatsapp_report",
-    title:"Daily WhatsApp reports",
-    fields:[
+    table: "daily_whatsapp_report",
+    title: "Daily WhatsApp reports",
+    fields: [
       ["report_date","Report date","date",true],
       ["report_text","Report text","textarea",true],
       ["status","Status","select",true,["Draft","Ready to send","Sent"]],
@@ -456,7 +340,7 @@ function localDateTime() {
 }
 
 function esc(value) {
-  return String(value ?? "").replace(/[&<>"']/g,c => ({
+  return String(value ?? "").replace(/[&<>"']/g, c => ({
     "&":"&amp;",
     "<":"&lt;",
     ">":"&gt;",
@@ -466,9 +350,7 @@ function esc(value) {
 }
 
 function fmt(value) {
-  return Number(value).toLocaleString("en-ZA",{
-    maximumFractionDigits:2
-  });
+  return Number(value).toLocaleString("en-ZA",{maximumFractionDigits:2});
 }
 
 function showMessage(element,message,type="info") {
@@ -512,7 +394,6 @@ function makeField(field,index,key) {
 
 function buildSection(key,config) {
   const root = $("page-" + key);
-
   root.innerHTML = `
     <h2>${esc(config.title)}</h2>
     <div class="panel">
@@ -537,20 +418,17 @@ function buildSection(key,config) {
     </div>`;
 
   $("form-" + key).addEventListener("submit",e => saveRecord(e,key,config));
-
   $("form-" + key).addEventListener("reset",() => {
     setTimeout(() => {
       root.querySelectorAll('input[type="date"]').forEach(el => el.value = localDate());
       root.querySelectorAll('input[type="datetime-local"]').forEach(el => el.value = localDateTime());
     },0);
   });
-
   $("reload-" + key).addEventListener("click",() => loadRecords(key,config));
 }
 
 async function saveRecord(event,key,config) {
   event.preventDefault();
-
   const form = event.currentTarget;
   const message = $("message-" + key);
   const button = form.querySelector('button[type="submit"]');
@@ -559,7 +437,6 @@ async function saveRecord(event,key,config) {
   for (const [name,label,type,required] of config.fields) {
     const control = form.elements.namedItem(name);
     if (!control) continue;
-
     const raw = control.value.trim();
 
     if (required && !raw) {
@@ -567,7 +444,6 @@ async function saveRecord(event,key,config) {
       control.focus();
       return;
     }
-
     if (!raw) continue;
 
     if (type === "number") {
@@ -579,14 +455,24 @@ async function saveRecord(event,key,config) {
       }
       payload[name] = n;
     } else if (type === "datetime-local") {
-      const date = new Date(raw);
-      if (Number.isNaN(date.getTime())) {
+      const d = new Date(raw);
+      if (Number.isNaN(d.getTime())) {
         showMessage(message,"Enter a valid date and time.","warn");
         return;
       }
-      payload[name] = date.toISOString();
+      payload[name] = d.toISOString();
     } else {
       payload[name] = raw;
+    }
+  }
+
+  if (key === "hours" && payload.start_hours !== undefined && payload.end_hours !== undefined) {
+    if (payload.end_hours < payload.start_hours) {
+      showMessage(message,"Ending hours cannot be lower than starting hours.","warn");
+      return;
+    }
+    if (payload.hours_worked === undefined) {
+      payload.hours_worked = Number((payload.end_hours - payload.start_hours).toFixed(2));
     }
   }
 
@@ -597,9 +483,7 @@ async function saveRecord(event,key,config) {
   try {
     const {data:authData,error:authError} = await db.auth.getUser();
     if (authError) throw authError;
-
     const user = authData?.user;
-
     if (user && ["production_entries","client_pickups"].includes(config.table)) {
       payload.entered_by = user.id;
     }
@@ -611,12 +495,11 @@ async function saveRecord(event,key,config) {
     form.reset();
     await loadRecords(key,config);
     await refreshDashboard();
-
   } catch (error) {
     showMessage(message,
       "Could not save to " + config.table + ".\n" +
       (error.message || String(error)) +
-      "\n\nIf this mentions a missing column or row-level security, the database schema or permissions need to be checked.",
+      "\n\nCheck that the table, columns and Supabase permissions match this form.",
       "error");
   } finally {
     button.disabled = false;
@@ -631,8 +514,7 @@ async function loadRecords(key,config) {
   try {
     const {data,error} = await db.from(config.table).select("*").limit(20);
     if (error) throw error;
-
-    if (!data || data.length === 0) {
+    if (!data?.length) {
       container.innerHTML = '<div class="muted">No records found yet.</div>';
       return;
     }
@@ -640,21 +522,17 @@ async function loadRecords(key,config) {
     container.innerHTML = data.map((row,index) => {
       const title = row.client_name
         ? "Client: " + row.client_name
-        : row.machine_name || row.material || ("Record " + (index+1));
+        : row.machine_name || row.material || row.report_title || ("Record " + (index+1));
 
       const details = Object.entries(row)
-        .filter(([name]) => name !== "id")
+        .filter(([name]) => !["id","file_path"].includes(name))
         .slice(0,16)
         .map(([name,value]) =>
           `<div><span class="muted">${esc(name.replaceAll("_"," "))}:</span> ${esc(value)}</div>`
         ).join("");
 
-      return `<div class="record">
-        <div class="record-title">${esc(title)}</div>
-        ${details}
-      </div>`;
+      return `<div class="record"><div class="record-title">${esc(title)}</div>${details}</div>`;
     }).join("");
-
   } catch (error) {
     container.innerHTML = "";
     showMessage($("message-" + key),
@@ -685,37 +563,29 @@ async function loadStockpile() {
   try {
     const {data,error} = await db.from("stockpile_balances").select("*");
     if (error) throw error;
-
     const rows = data || [];
 
-    function findMaterialStock(term) {
-      const matches = rows.filter(row => materialName(row).includes(term));
+    function find(term) {
+      const matches = rows.filter(r => materialName(r).includes(term));
       if (!matches.length) return null;
-
       const values = matches.map(stockQuantity);
       if (values.some(v => !Number.isFinite(v))) return null;
-
-      return values.reduce((sum,v) => sum + v,0);
+      return values.reduce((a,b) => a+b,0);
     }
 
-    const building = findMaterialStock("building");
-    const plaster = findMaterialStock("plaster");
-
-    $("buildingStock").textContent = building === null
-      ? "Check database" : fmt(building) + " m³";
-
-    $("plasterStock").textContent = plaster === null
-      ? "Check database" : fmt(plaster) + " m³";
+    const building = find("building");
+    const plaster = find("plaster");
+    $("buildingStock").textContent = building === null ? "Check database" : fmt(building) + " m³";
+    $("plasterStock").textContent = plaster === null ? "Check database" : fmt(plaster) + " m³";
 
     if (!rows.length) {
       list.innerHTML = '<div class="muted">No stockpile rows found.</div>';
       return;
     }
 
-    list.innerHTML = rows.map(row => {
-      const name = materialName(row) || "Sand stockpile";
-      const quantity = stockQuantity(row);
-
+    list.innerHTML = rows.map(r => {
+      const name = materialName(r) || "Sand stockpile";
+      const quantity = stockQuantity(r);
       return `<div class="record">
         <div class="record-title">${esc(name)}</div>
         <div class="metric-value">${Number.isFinite(quantity) ? esc(fmt(quantity)) + " m³" : "Quantity unavailable"}</div>
@@ -723,11 +593,8 @@ async function loadStockpile() {
     }).join("");
 
     if (building === null || plaster === null) {
-      showMessage(message,
-        "At least one sand stockpile was not matched. Check the material names and quantity column in stockpile_balances.",
-        "warn");
+      showMessage(message,"At least one stockpile was not matched. Verify the material and quantity columns in stockpile_balances.","warn");
     }
-
   } catch (error) {
     $("buildingStock").textContent = "Unavailable";
     $("plasterStock").textContent = "Unavailable";
@@ -739,30 +606,23 @@ async function loadStockpile() {
 async function loadDailyProduction() {
   const status = $("productionStatus");
   hideMessage(status);
-
   const now = new Date();
   const start = new Date(now.getFullYear(),now.getMonth(),now.getDate());
   const end = new Date(now.getFullYear(),now.getMonth(),now.getDate()+1);
-
-  $("dashboardDate").textContent =
-    "Today's production · " + start.toLocaleDateString("en-ZA");
+  $("dashboardDate").textContent = "Today's production · " + start.toLocaleDateString("en-ZA");
 
   try {
-    const {data,error} = await db
-      .from("production_entries")
+    const {data,error} = await db.from("production_entries")
       .select("produced_at,material,quantity_m3")
       .gte("produced_at",start.toISOString())
       .lt("produced_at",end.toISOString());
-
     if (error) throw error;
 
     let building = 0;
     let plaster = 0;
-
     for (const row of data || []) {
       const material = String(row.material || "").toLowerCase();
       const quantity = Number(row.quantity_m3);
-
       if (!Number.isFinite(quantity)) continue;
       if (material.includes("building")) building += quantity;
       if (material.includes("plaster")) plaster += quantity;
@@ -771,28 +631,25 @@ async function loadDailyProduction() {
     $("buildingProduced").textContent = fmt(building) + " m³";
     $("plasterProduced").textContent = fmt(plaster) + " m³";
     $("totalProduced").textContent = fmt(building + plaster) + " m³";
-
   } catch (error) {
     $("buildingProduced").textContent = "Unavailable";
     $("plasterProduced").textContent = "Unavailable";
     $("totalProduced").textContent = "Unavailable";
-
     showMessage(status,
-      "Could not calculate today's production. Check the produced_at, material and quantity_m3 columns. " +
+      "Could not calculate today's production. Verify produced_at, material and quantity_m3. " +
       (error.message || String(error)),
       "error");
   }
 }
 
-async function countRows(table,elementId,filter) {
+async function countRows(table,id,filter) {
   try {
     const {data,error} = await db.from(table).select("*").limit(500);
     if (error) throw error;
-
     const rows = data || [];
-    $(elementId).textContent = String(filter ? rows.filter(filter).length : rows.length);
+    $(id).textContent = String(filter ? rows.filter(filter).length : rows.length);
   } catch {
-    $(elementId).textContent = "—";
+    $(id).textContent = "—";
   }
 }
 
@@ -803,9 +660,7 @@ async function refreshDashboard() {
     countRows("production_entries","productionCount"),
     countRows("client_pickups","pickupCount"),
     countRows("machine_breakdowns","breakdownCount",row =>
-      !["completed","closed","resolved"].includes(
-        String(row.status || "").toLowerCase()
-      )
+      !["completed","closed","resolved"].includes(String(row.status || "").toLowerCase())
     ),
     countRows("approval_requests","approvalCount",row =>
       String(row.status || "pending").toLowerCase() === "pending"
@@ -816,20 +671,227 @@ async function refreshDashboard() {
 function showPage(key) {
   document.querySelectorAll(".page").forEach(page => page.classList.add("hidden"));
   $("page-" + key).classList.remove("hidden");
-
-  document.querySelectorAll("#navigation button").forEach(button => {
-    button.classList.toggle("active",button.dataset.page === key);
-  });
-
+  document.querySelectorAll("#navigation button").forEach(button =>
+    button.classList.toggle("active",button.dataset.page === key)
+  );
   if (key === "home") refreshDashboard();
   if (definitions[key]) loadRecords(key,definitions[key]);
+  if (key === "dmre") loadDmreReports();
 }
-
-Object.entries(definitions).forEach(([key,config]) => buildSection(key,config));
 
 document.querySelectorAll("#navigation button").forEach(button => {
   button.addEventListener("click",() => showPage(button.dataset.page));
 });
+
+// DMRE report archive. The bucket must be private.
+function buildDmreSection() {
+  const root = $("page-dmre");
+  root.innerHTML = `
+    <h2>DMRE Reports</h2>
+    <div class="panel">
+      <h3>Upload DMRE report</h3>
+      <form id="dmreForm">
+        <div class="form-grid">
+          <label>Report title <span class="required">*</span>
+            <input name="report_title" required maxlength="180" placeholder="e.g. DMRE inspection report">
+          </label>
+          <label>Inspection date <span class="required">*</span>
+            <input name="inspection_date" type="date" required value="${localDate()}">
+          </label>
+          <label>DMRE reference number
+            <input name="dmre_reference" maxlength="120">
+          </label>
+          <label>Inspector / DMRE official
+            <input name="inspector" maxlength="180">
+          </label>
+          <label>Compliance status <span class="required">*</span>
+            <select name="status" required>
+              <option value="">Choose status</option>
+              <option>Open</option>
+              <option>In progress</option>
+              <option>Resolved</option>
+            </select>
+          </label>
+          <label>Report file <span class="required">*</span>
+            <input name="report_file" type="file" accept=".pdf,.jpg,.jpeg,.png,.webp,.doc,.docx" required>
+          </label>
+        </div>
+        <div class="file-note">PDF, image, DOC or DOCX · maximum 20 MB per file.</div>
+        <label>Findings
+          <textarea name="findings" required placeholder="Summarise the findings in the report"></textarea>
+        </label>
+        <label>Corrective actions / due dates
+          <textarea name="corrective_action" placeholder="Actions required, responsible person and target date"></textarea>
+        </label>
+        <div class="actions">
+          <button type="submit" id="dmreSaveButton">Upload and save report</button>
+          <button type="reset" class="secondary">Clear form</button>
+        </div>
+      </form>
+      <div id="dmreMessage" class="status hidden"></div>
+    </div>
+    <div class="panel">
+      <h3>Saved DMRE reports</h3>
+      <div id="dmreRecords" class="list">Open this section to load reports.</div>
+      <div class="actions">
+        <button type="button" class="secondary" id="dmreReload">Refresh reports</button>
+      </div>
+    </div>`;
+
+  const form = $("dmreForm");
+  form.addEventListener("submit",uploadDmreReport);
+  form.addEventListener("reset",() => setTimeout(() => {
+    form.elements.inspection_date.value = localDate();
+  },0));
+  $("dmreReload").addEventListener("click",loadDmreReports);
+}
+
+function safeFileName(name) {
+  return name.normalize("NFKD")
+    .replace(/[^a-zA-Z0-9._-]+/g,"_")
+    .replace(/^\.+/,"")
+    .slice(-150) || "report";
+}
+
+async function uploadDmreReport(event) {
+  event.preventDefault();
+  const form = event.currentTarget;
+  const message = $("dmreMessage");
+  const button = $("dmreSaveButton");
+  const file = form.elements.report_file.files[0];
+
+  if (!file) {
+    showMessage(message,"Choose a report file first.","warn");
+    return;
+  }
+  if (file.size > MAX_REPORT_BYTES) {
+    showMessage(message,"The file is larger than 20 MB. Please choose a smaller report.","warn");
+    return;
+  }
+  if (!ALLOWED_REPORT_TYPES.includes(file.type) && ! /\.(pdf|jpe?g|png|webp|docx?)$/i.test(file.name)) {
+    showMessage(message,"Unsupported file type. Upload PDF, JPG, PNG, WEBP, DOC or DOCX.","warn");
+    return;
+  }
+
+  button.disabled = true;
+  button.textContent = "Uploading...";
+  hideMessage(message);
+  let path = null;
+
+  try {
+    const {data:authData,error:authError} = await db.auth.getUser();
+    if (authError) throw authError;
+    if (!authData.user) throw new Error("Please sign in again before uploading.");
+
+    const user = authData.user;
+    path = `${user.id}/${Date.now()}_${safeFileName(file.name)}`;
+
+    const {error:uploadError} = await db.storage.from(DMRE_BUCKET).upload(path,file,{
+      cacheControl:"3600",
+      upsert:false,
+      contentType:file.type || undefined
+    });
+    if (uploadError) throw uploadError;
+
+    const payload = {
+      report_title:form.elements.report_title.value.trim(),
+      inspection_date:form.elements.inspection_date.value,
+      dmre_reference:form.elements.dmre_reference.value.trim() || null,
+      inspector:form.elements.inspector.value.trim() || null,
+      status:form.elements.status.value,
+      findings:form.elements.findings.value.trim(),
+      corrective_action:form.elements.corrective_action.value.trim() || null,
+      file_path:path,
+      file_name:file.name,
+      file_size_bytes:file.size,
+      uploaded_by:user.id
+    };
+
+    const {error:insertError} = await db.from("dmre_reports").insert(payload);
+    if (insertError) throw insertError;
+
+    showMessage(message,"DMRE report uploaded and saved successfully.","ok");
+    form.reset();
+    await loadDmreReports();
+  } catch (error) {
+    if (path) {
+      try {
+        await db.storage.from(DMRE_BUCKET).remove([path]);
+      } catch {}
+    }
+    showMessage(message,
+      "Could not upload/save DMRE report.\n" +
+      (error.message || String(error)) +
+      "\n\nConfirm that the dmre_reports table, private dmre-reports bucket and storage/database policies have been created.",
+      "error");
+  } finally {
+    button.disabled = false;
+    button.textContent = "Upload and save report";
+  }
+}
+
+async function loadDmreReports() {
+  const box = $("dmreRecords");
+  if (!box) return;
+  box.textContent = "Loading reports...";
+
+  try {
+    const {data,error} = await db.from("dmre_reports")
+      .select("id,report_title,inspection_date,dmre_reference,inspector,status,findings,corrective_action,file_path,file_name,created_at")
+      .order("created_at",{ascending:false})
+      .limit(50);
+    if (error) throw error;
+
+    if (!data?.length) {
+      box.innerHTML = '<div class="muted">No DMRE reports saved yet.</div>';
+      return;
+    }
+
+    box.innerHTML = data.map(row => `
+      <div class="record">
+        <div class="record-title">${esc(row.report_title || row.file_name || "DMRE report")}</div>
+        <div><span class="muted">Inspection date:</span> ${esc(row.inspection_date || "—")}</div>
+        <div><span class="muted">Reference:</span> ${esc(row.dmre_reference || "—")}</div>
+        <div><span class="muted">Inspector:</span> ${esc(row.inspector || "—")}</div>
+        <div><span class="muted">Status:</span> ${esc(row.status || "—")}</div>
+        <div><span class="muted">Findings:</span> ${esc(row.findings || "—")}</div>
+        <div><span class="muted">Corrective action:</span> ${esc(row.corrective_action || "—")}</div>
+        <div class="muted">File: ${esc(row.file_name || "Attached report")}</div>
+        <div class="actions">
+          <button type="button" class="secondary" data-dmre-file="${esc(row.id)}">Open / download report</button>
+        </div>
+      </div>`).join("");
+
+    box.querySelectorAll("[data-dmre-file]").forEach(button => {
+      button.addEventListener("click",() =>
+        openDmreFile(data.find(row => String(row.id) === button.dataset.dmreFile))
+      );
+    });
+  } catch (error) {
+    box.innerHTML = "";
+    showMessage($("dmreMessage"),
+      "Could not load DMRE reports. " + (error.message || String(error)) +
+      "\nCheck dmre_reports columns and database permissions.",
+      "error");
+  }
+}
+
+async function openDmreFile(row) {
+  if (!row?.file_path) return;
+  try {
+    const {data,error} = await db.storage.from(DMRE_BUCKET).createSignedUrl(row.file_path,300);
+    if (error) throw error;
+    window.open(data.signedUrl,"_blank","noopener,noreferrer");
+  } catch (error) {
+    showMessage($("dmreMessage"),
+      "Could not open report: " + (error.message || String(error)) +
+      "\nCheck the private storage bucket policies.",
+      "error");
+  }
+}
+
+Object.entries(definitions).forEach(([key,config]) => buildSection(key,config));
+buildDmreSection();
 
 function showLogin() {
   $("appPanel").classList.add("hidden");
@@ -838,7 +900,6 @@ function showLogin() {
 
 async function showApp(session) {
   if (!session) return;
-
   $("loginPanel").classList.add("hidden");
   $("appPanel").classList.remove("hidden");
   $("userEmail").textContent = session.user.email || "Signed in";
@@ -848,10 +909,8 @@ async function showApp(session) {
 
 $("loginForm").addEventListener("submit",async event => {
   event.preventDefault();
-
   const button = $("loginButton");
   const message = $("loginMessage");
-
   button.disabled = true;
   button.textContent = "Signing in...";
   hideMessage(message);
@@ -861,10 +920,8 @@ $("loginForm").addEventListener("submit",async event => {
       email:$("email").value.trim(),
       password:$("password").value
     });
-
     if (error) throw error;
     await showApp(data.session);
-
   } catch (error) {
     showMessage(message,"Login failed: " + (error.message || String(error)),"error");
   } finally {
@@ -875,7 +932,6 @@ $("loginForm").addEventListener("submit",async event => {
 
 $("logoutButton").addEventListener("click",async () => {
   const {error} = await db.auth.signOut();
-
   if (error) showMessage($("globalMessage"),error.message,"error");
   else showLogin();
 });
@@ -900,10 +956,8 @@ db.auth.onAuthStateChange((event,session) => {
   try {
     const {data,error} = await db.auth.getSession();
     if (error) throw error;
-
     if (data.session) await showApp(data.session);
     else showLogin();
-
   } catch (error) {
     showMessage($("loginMessage"),
       "Could not connect to Supabase. " + (error.message || String(error)),
