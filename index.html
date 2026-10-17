@@ -3,536 +3,489 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width,initial-scale=1">
 <title>501 Mining | Mine Manager</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
-:root {
-  --bg:#10151d;
-  --panel:#1b2430;
-  --gold:#e5ad32;
-  --text:#f4f6fa;
-  --muted:#aab4c2;
-  --border:#354152;
-}
-* { box-sizing:border-box; }
-body {
-  margin:0;
-  background:var(--bg);
-  color:var(--text);
-  font-family:Arial,sans-serif;
-}
-header {
-  padding:20px;
-  background:#18212c;
-  border-bottom:3px solid var(--gold);
-}
-h1 { margin:0; font-size:25px; }
-header p { color:var(--muted); margin:6px 0 0; }
-main { max-width:1100px; margin:auto; padding:16px; }
-.panel,.metric {
-  background:var(--panel);
-  padding:16px;
-  border-radius:12px;
-  margin-bottom:14px;
-}
-h2 { font-size:19px; margin-top:0; }
-.small { color:var(--muted); font-size:13px; }
-input,select,textarea,button {
-  width:100%;
-  padding:12px;
-  margin:6px 0;
-  border-radius:8px;
-  font-size:15px;
-}
-input,select,textarea {
-  background:#10151d;
-  color:white;
-  border:1px solid #465263;
-}
-textarea { min-height:85px; resize:vertical; }
-button {
-  background:var(--gold);
-  border:0;
-  color:#151515;
-  font-weight:bold;
-  cursor:pointer;
-}
-button:disabled { opacity:.55; }
-button.secondary { background:#354152; color:white; }
-button.active { outline:2px solid white; }
-nav {
-  display:grid;
-  grid-template-columns:repeat(2,minmax(0,1fr));
-  gap:7px;
-  margin:12px 0;
-}
-nav button { margin:0; min-height:46px; }
-.grid {
-  display:grid;
-  grid-template-columns:repeat(2,minmax(0,1fr));
-  gap:10px;
-}
-.metric span { color:var(--muted); font-size:13px; }
-.metric strong { display:block; font-size:25px; margin-top:8px; }
-.hidden { display:none!important; }
-pre {
-  white-space:pre-wrap;
-  overflow-wrap:anywhere;
-  font-size:12px;
-  color:#dbe4f0;
-}
-.status { overflow-wrap:anywhere; }
-@media(min-width:700px) {
-  nav { grid-template-columns:repeat(4,minmax(0,1fr)); }
-  .grid { grid-template-columns:repeat(4,minmax(0,1fr)); }
-  .formgrid { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
-}
+:root{--bg:#10151d;--panel:#1b2430;--gold:#e5ad32;--text:#f4f6fa;--muted:#aab4c2;--border:#354152}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);font-family:Arial,sans-serif}
+header{padding:20px;background:#18212c;border-bottom:3px solid var(--gold)}
+h1{margin:0;font-size:25px}
+header p,.muted{color:var(--muted)}
+main{max-width:1000px;margin:auto;padding:14px}
+.panel,.metric{background:var(--panel);padding:16px;border-radius:12px;margin-bottom:13px}
+h2{font-size:20px;margin-top:0}
+nav{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin:14px 0}
+button,input,select,textarea{width:100%;padding:12px;margin:5px 0;border-radius:8px;font-size:15px}
+button{border:0;background:var(--gold);color:#171717;font-weight:bold;cursor:pointer}
+button.secondary{background:#354152;color:white}
+button.active{outline:2px solid white}
+input,select,textarea{background:#10151d;color:white;border:1px solid #465263}
+textarea{min-height:85px}
+.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.metric span{font-size:13px;color:var(--muted)}
+.metric strong{display:block;font-size:25px;margin-top:8px}
+.hidden{display:none!important}
+label{display:block;margin-top:10px;font-size:14px}
+.status{overflow-wrap:anywhere;white-space:pre-wrap}
+pre{white-space:pre-wrap;overflow-wrap:anywhere;font-size:12px}
+@media(min-width:700px){nav{grid-template-columns:repeat(4,minmax(0,1fr))}.grid{grid-template-columns:repeat(4,minmax(0,1fr))}.formgrid{display:grid;grid-template-columns:1fr 1fr;gap:10px}}
 </style>
 </head>
 <body>
 <header>
-  <h1>501 MINING</h1>
-  <p>Mine Management System</p>
+<h1>501 MINING</h1>
+<p>Mine Management System</p>
 </header>
 
 <main>
-  <section id="login" class="panel">
-    <h2>Manager sign in</h2>
-    <p class="small">Sign in with your existing Supabase account.</p>
-    <form id="loginForm">
-      <input id="email" type="email" placeholder="Email address"
-        autocomplete="username" required>
-      <input id="password" type="password" placeholder="Password"
-        autocomplete="current-password" required>
-      <button id="loginBtn" type="submit">Sign in</button>
-    </form>
-    <p id="loginMsg" class="small status" role="status"></p>
-  </section>
+<section id="login" class="panel">
+<h2>Manager sign in</h2>
+<form id="loginForm">
+<input id="email" type="email" placeholder="Email address" required>
+<input id="password" type="password" placeholder="Password" required>
+<button id="loginBtn">Sign in</button>
+</form>
+<p id="loginMsg" class="status muted"></p>
+</section>
 
-  <section id="app" class="hidden">
-    <div class="panel">
-      <strong id="welcome">Mine dashboard</strong>
-      <p id="today" class="small"></p>
-      <button id="refreshBtn">Refresh dashboard</button>
-      <button id="logoutBtn" class="secondary">Sign out</button>
-    </div>
+<section id="app" class="hidden">
+<div class="panel">
+<strong id="welcome">Mine dashboard</strong>
+<p id="today" class="muted"></p>
+<button id="homeBtn">Dashboard home</button>
+<button id="refreshBtn" class="secondary">Refresh figures</button>
+<button id="logoutBtn" class="secondary">Sign out</button>
+</div>
 
-    <div class="grid">
-      <div class="metric">
-        <span>Production entries</span>
-        <strong id="productionCount">—</strong>
-      </div>
-      <div class="metric">
-        <span>Customer pickups</span>
-        <strong id="pickupCount">—</strong>
-      </div>
-      <div class="metric">
-        <span>Open breakdowns</span>
-        <strong id="breakdownCount">—</strong>
-      </div>
-      <div class="metric">
-        <span>Pending approvals</span>
-        <strong id="approvalCount">—</strong>
-      </div>
-    </div>
+<div id="home">
+<div class="grid">
+<div class="metric"><span>Production entries</span><strong id="productionCount">—</strong></div>
+<div class="metric"><span>Customer pickups</span><strong id="pickupCount">—</strong></div>
+<div class="metric"><span>Open breakdowns</span><strong id="breakdownCount">—</strong></div>
+<div class="metric"><span>Pending approvals</span><strong id="approvalCount">—</strong></div>
+</div>
+<p class="muted">Choose a section below to add or view records.</p>
+</div>
 
-    <nav id="navigation">
-      <button type="button" data-view="production">Production</button>
-      <button type="button" data-view="pickups">Customer pickups</button>
-      <button type="button" data-view="stockpile_balances">Stockpiles</button>
-      <button type="button" data-view="daily_machine_hours">Machine hours</button>
-      <button type="button" data-view="machine_breakdowns">Breakdowns</button>
-      <button type="button" data-view="job_cards">Job cards</button>
-      <button type="button" data-view="diesel_logs">Diesel</button>
-      <button type="button" data-view="maintenance_records">Maintenance</button>
-      <button type="button" data-view="staff_duties">Staff duties</button>
-      <button type="button" data-view="safety_inspections">Safety</button>
-      <button type="button" data-view="approval_requests">Approvals</button>
-      <button type="button" data-view="daily_whatsapp_report">Daily report</button>
-    </nav>
+<nav id="navigation">
+<button data-view="production">Production</button>
+<button data-view="pickups">Customer pickups</button>
+<button data-view="stockpiles">Stockpiles</button>
+<button data-view="hours">Machine hours</button>
+<button data-view="breakdowns">Breakdowns</button>
+<button data-view="jobs">Job cards</button>
+<button data-view="diesel">Diesel</button>
+<button data-view="maintenance">Maintenance</button>
+<button data-view="duties">Staff duties</button>
+<button data-view="safety">Safety inspections</button>
+<button data-view="approvals">Approval requests</button>
+<button data-view="report">Daily report</button>
+</nav>
 
-    <section id="productionPanel" class="panel hidden">
-      <h2>Record production</h2>
-      <p class="small">Record screened or washed sand produced.</p>
-      <form id="productionForm">
-        <label for="prodMaterial">Material</label>
-        <select id="prodMaterial" required>
-          <option value="">Choose material</option>
-          <option value="Building sand">Building sand</option>
-          <option value="Plaster sand">Plaster sand</option>
-          <option value="Other">Other</option>
-        </select>
-        <label for="prodQuantity">Quantity produced (m³)</label>
-        <input id="prodQuantity" type="number" min="0.01"
-          step="0.01" placeholder="e.g. 60" required>
-        <div class="formgrid">
-          <div>
-            <label for="prodMachine">Machine / plant</label>
-            <input id="prodMachine" placeholder="e.g. Screening plant">
-          </div>
-          <div>
-            <label for="prodStart">Start time</label>
-            <input id="prodStart" type="time">
-          </div>
-          <div>
-            <label for="prodEnd">End time</label>
-            <input id="prodEnd" type="time">
-          </div>
-          <div>
-            <label for="prodDate">Date and time</label>
-            <input id="prodDate" type="datetime-local">
-          </div>
-        </div>
-        <label for="prodDestination">Destination / notes</label>
-        <textarea id="prodDestination"
-          placeholder="Shift details, destination or other notes"></textarea>
-        <button id="saveProduction" type="submit">Save production</button>
-      </form>
-      <p id="productionMsg" class="small status" role="status"></p>
-    </section>
+<section id="entryPanel" class="panel hidden">
+<h2 id="formTitle">Record entry</h2>
+<p id="formDescription" class="muted"></p>
+<form id="entryForm"></form>
+<p id="formMsg" class="status muted" role="status"></p>
+</section>
 
-    <section id="pickupsPanel" class="panel hidden">
-      <h2>Record customer pickup</h2>
-      <form id="pickupForm">
-        <label for="pickupClient">Customer name</label>
-        <input id="pickupClient" required placeholder="Customer / company">
-        <label for="pickupMaterial">Material collected</label>
-        <select id="pickupMaterial" required>
-          <option value="">Choose material</option>
-          <option value="Building sand">Building sand</option>
-          <option value="Plaster sand">Plaster sand</option>
-          <option value="Other">Other</option>
-        </select>
-        <label for="pickupQuantity">Quantity collected (m³)</label>
-        <input id="pickupQuantity" type="number" min="0.01"
-          step="0.01" required placeholder="e.g. 4">
-        <label for="pickupTruck">Truck registration</label>
-        <input id="pickupTruck" placeholder="Registration number">
-        <label for="pickupNote">Delivery note number</label>
-        <input id="pickupNote" placeholder="Optional">
-        <label for="pickupNotes">Notes</label>
-        <textarea id="pickupNotes" placeholder="Optional notes"></textarea>
-        <button id="savePickup" type="submit">Save customer pickup</button>
-      </form>
-      <p id="pickupMsg" class="small status" role="status"></p>
-    </section>
-
-    <section id="recordsPanel" class="panel hidden">
-      <h2 id="sectionTitle">Mine records</h2>
-      <p id="status" class="small status" role="status"></p>
-      <pre id="results"></pre>
-    </section>
-  </section>
+<section id="recordsPanel" class="panel hidden">
+<h2 id="recordsTitle">Records</h2>
+<button id="reloadRecords" class="secondary">Reload records</button>
+<p id="recordsMsg" class="status muted"></p>
+<pre id="records"></pre>
+</section>
+</section>
 </main>
 
 <script>
 "use strict";
 
-const SUPABASE_URL = "https://guintqihzpecbjvdgtdg.supabase.co";
-const SUPABASE_PUBLISHABLE_KEY =
-  "sb_publishable_ts9yQRmjpbnmxFAtukasYQ_7nacpxta";
+const SUPABASE_URL="https://guintqihzpecbjvdgtdg.supabase.co";
+const SUPABASE_PUBLISHABLE_KEY="sb_publishable_ts9yQRmjpbnmxFAtukasYQ_7nacpxta";
 
-const $ = id => document.getElementById(id);
+const $=id=>document.getElementById(id);
+let db=null;
+let currentUser=null;
+let activeView="production";
 
-const tableNames = {
-  stockpile_balances: "Stockpile balances",
-  daily_machine_hours: "Machine hours",
-  machine_breakdowns: "Breakdowns",
-  job_cards: "Job cards",
-  diesel_logs: "Diesel logs",
-  maintenance_records: "Maintenance",
-  staff_duties: "Staff duties",
-  safety_inspections: "Safety inspections",
-  approval_requests: "Approval requests",
-  daily_whatsapp_report: "Daily WhatsApp report"
+const sections={
+production:{
+title:"Record production",
+table:"production_entries",
+description:"Record building sand or plaster sand produced.",
+fields:[
+["material","Material","select",["Building sand","Plaster sand","Other"],true],
+["quantity_m3","Quantity produced (m³)","number",null,true],
+["machine_id","Machine / plant","text",null,false],
+["start_time","Start time","time",null,false],
+["end_time","End time","time",null,false],
+["produced_at","Production date and time","datetime-local",null,true],
+["customer_or_destination","Destination","text",null,false],
+["notes","Notes","textarea",null,false]
+]},
+pickups:{
+title:"Customer pickup",
+table:"client_pickups",
+description:"Record sand collected by a customer. This updates stock automatically through your existing database trigger.",
+fields:[
+["client_name","Customer / company","text",null,true],
+["material","Material","select",["Building sand","Plaster sand","Other"],true],
+["quantity_m3","Quantity collected (m³)","number",null,true],
+["truck_registration","Truck registration","text",null,false],
+["delivery_note_number","Delivery note number","text",null,false],
+["collected_at","Collection date and time","datetime-local",null,true],
+["notes","Notes","textarea",null,false]
+]},
+hours:{
+title:"Machine hours",
+table:"daily_machine_hours",
+description:"Record machine operating hours for the shift.",
+fields:[
+["work_date","Work date","date",null,true],
+["machine_name","Machine","text",null,true],
+["operator_name","Operator","text",null,false],
+["start_hours","Starting hour-meter reading","number",null,true],
+["end_hours","Ending hour-meter reading","number",null,true],
+["hours_worked","Hours worked","number",null,false],
+["notes","Notes","textarea",null,false]
+]},
+breakdowns:{
+title:"Machine breakdown",
+table:"machine_breakdowns",
+description:"Log a breakdown and its current status.",
+fields:[
+["machine_name","Machine","text",null,true],
+["breakdown_date","Breakdown date and time","datetime-local",null,true],
+["problem_description","Problem / fault","textarea",null,true],
+["downtime_hours","Downtime (hours)","number",null,false],
+["status","Status","select",["Open","In progress","Resolved"],true],
+["notes","Repairs / parts / notes","textarea",null,false]
+]},
+jobs:{
+title:"Job card",
+table:"job_cards",
+description:"Create a maintenance or repair job.",
+fields:[
+["job_card_number","Job card number","text",null,false],
+["machine_name","Machine","text",null,true],
+["job_description","Work required","textarea",null,true],
+["priority","Priority","select",["Low","Normal","High","Urgent"],true],
+["assigned_to","Assigned to","text",null,false],
+["status","Status","select",["Open","In progress","Completed"],true],
+["notes","Notes","textarea",null,false]
+]},
+diesel:{
+title:"Diesel log",
+table:"diesel_logs",
+description:"Record diesel issued to a machine or vehicle.",
+fields:[
+["log_date","Date and time","datetime-local",null,true],
+["machine_name","Machine / vehicle","text",null,true],
+["litres","Litres issued","number",null,true],
+["hour_meter","Hour-meter reading","number",null,false],
+["issued_to","Issued to","text",null,false],
+["notes","Notes","textarea",null,false]
+]},
+maintenance:{
+title:"Maintenance record",
+table:"maintenance_records",
+description:"Record scheduled or completed maintenance.",
+fields:[
+["maintenance_date","Maintenance date","date",null,true],
+["machine_name","Machine","text",null,true],
+["maintenance_type","Maintenance type","select",["Service","Repair","Inspection","Other"],true],
+["description","Work completed / required","textarea",null,true],
+["cost","Cost (R)","number",null,false],
+["next_service_hours","Next service hour-meter reading","number",null,false],
+["notes","Notes","textarea",null,false]
+]},
+duties:{
+title:"Staff duties",
+table:"staff_duties",
+description:"Assign and track daily staff duties.",
+fields:[
+["duty_date","Duty date","date",null,true],
+["staff_name","Staff member","text",null,true],
+["duty_description","Duty / task","textarea",null,true],
+["status","Status","select",["Assigned","In progress","Completed"],true],
+["notes","Notes","textarea",null,false]
+]},
+safety:{
+title:"Safety inspection",
+table:"safety_inspections",
+description:"Record a mine safety inspection and follow-up action.",
+fields:[
+["inspection_date","Inspection date","date",null,true],
+["inspected_by","Inspected by","text",null,true],
+["area","Area / machine inspected","text",null,true],
+["findings","Findings","textarea",null,true],
+["corrective_action","Corrective action required","textarea",null,false],
+["status","Status","select",["Safe","Action required","Follow-up needed"],true],
+["notes","Notes","textarea",null,false]
+]},
+approvals:{
+title:"Approval request",
+table:"approval_requests",
+description:"Submit an item for mine manager or boss approval.",
+fields:[
+["request_title","Request title","text",null,true],
+["request_description","Reason / details","textarea",null,true],
+["amount","Amount requested (R)","number",null,false],
+["requested_by_name","Requested by","text",null,true],
+["status","Status","select",["Pending","Approved","Rejected"],true]
+]},
+report:{
+title:"Daily WhatsApp report",
+table:"daily_whatsapp_report",
+description:"Prepare and save the daily mine report text.",
+fields:[
+["report_date","Report date","date",null,true],
+["report_text","Daily report","textarea",null,true]
+]}
 };
 
-let db;
-let currentUser = null;
-
-function say(id, text) {
-  $(id).textContent = text;
+function nowLocal(type="datetime-local"){
+const now=new Date();
+const local=new Date(now.getTime()-now.getTimezoneOffset()*60000);
+return type==="date"?local.toISOString().slice(0,10):local.toISOString().slice(0,16);
 }
 
-function localDateTimeValue() {
-  const now = new Date();
-  const offset = now.getTimezoneOffset() * 60000;
-  return new Date(now.getTime() - offset).toISOString().slice(0, 16);
+function escapeHtml(value){
+return String(value).replace(/[&<>"']/g,ch=>({
+"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"
+})[ch]);
 }
 
-function showView(view) {
-  $("productionPanel").classList.toggle("hidden", view !== "production");
-  $("pickupsPanel").classList.toggle("hidden", view !== "pickups");
-  $("recordsPanel").classList.toggle(
-    "hidden", view === "production" || view === "pickups"
-  );
-
-  document.querySelectorAll("#navigation button").forEach(button => {
-    button.classList.toggle("active", button.dataset.view === view);
-  });
-
-  if (view === "production") {
-    $("productionForm").reset();
-    $("prodDate").value = localDateTimeValue();
-    say("productionMsg", "");
-  } else if (view === "pickups") {
-    $("pickupForm").reset();
-    say("pickupMsg", "");
-  } else if (tableNames[view]) {
-    loadTable(view);
-  }
+function makeField(field){
+const [name,label,type,options,required]=field;
+const req=required?"required":"";
+let control="";
+if(type==="select"){
+control='<select name="'+name+'" '+req+'><option value="">Choose...</option>'+
+options.map(o=>'<option value="'+escapeHtml(o)+'">'+escapeHtml(o)+'</option>').join("")+
+'</select>';
+}else if(type==="textarea"){
+control='<textarea name="'+name+'" '+req+'></textarea>';
+}else{
+const step=type==="number"?" step=\"any\"": "";
+control='<input name="'+name+'" type="'+type+'"'+step+' '+req+'>';
+}
+return '<label>'+escapeHtml(label)+'</label>'+control;
 }
 
-async function refreshDashboard() {
-  say("status", "Refreshing dashboard...");
+function showView(view){
+activeView=view;
+$("home").classList.add("hidden");
+$("entryPanel").classList.add("hidden");
+$("recordsPanel").classList.add("hidden");
 
-  const checks = [
-    ["production_entries", "productionCount"],
-    ["client_pickups", "pickupCount"],
-    ["machine_breakdowns", "breakdownCount"],
-    ["approval_requests", "approvalCount"]
-  ];
+document.querySelectorAll("#navigation button").forEach(b=>{
+b.classList.toggle("active",b.dataset.view===view);
+});
 
-  for (const [table, id] of checks) {
-    try {
-      const { data, error } = await db.from(table).select("*").limit(500);
-      if (error) throw error;
-
-      if (table === "machine_breakdowns") {
-        $(id).textContent = data.filter(row =>
-          !["resolved", "closed", "completed"].includes(
-            String(row.status || "").toLowerCase()
-          )
-        ).length;
-      } else if (table === "approval_requests") {
-        $(id).textContent = data.filter(row =>
-          String(row.status || "").toLowerCase() === "pending"
-        ).length;
-      } else {
-        $(id).textContent = data.length;
-      }
-    } catch (error) {
-      $(id).textContent = "Error";
-      console.error("Dashboard count error:", table, error);
-    }
-  }
-
-  say("status", "Dashboard refreshed.");
+if(view==="stockpiles"){
+$("recordsPanel").classList.remove("hidden");
+$("recordsTitle").textContent="Current stockpiles";
+loadStockpiles();
+return;
 }
 
-async function loadTable(table) {
-  say("sectionTitle", tableNames[table] || table);
-  say("status", "Loading records...");
-  say("results", "");
+const section=sections[view];
+if(!section)return;
 
-  try {
-    const { data, error } = await db.from(table).select("*").limit(100);
-    if (error) throw error;
+$("entryPanel").classList.remove("hidden");
+$("formTitle").textContent=section.title;
+$("formDescription").textContent=section.description;
+$("formMsg").textContent="";
+$("entryForm").innerHTML=section.fields.map(makeField).join("")+
+'<button id="saveEntry" type="submit">Save '+escapeHtml(section.title.toLowerCase())+'</button>';
 
-    say("status", data.length + " record(s) found. Showing up to 100.");
-    say("results", JSON.stringify(data, null, 2));
-  } catch (error) {
-    say("status", "Could not load records: " + error.message);
-    say("results", "");
-  }
+section.fields.forEach(field=>{
+const input=$("entryForm").elements[field[0]];
+if(input&&field[0]==="produced_at")input.value=nowLocal();
+if(input&&field[0]==="collected_at")input.value=nowLocal();
+if(input&&field[0]==="log_date")input.value=nowLocal();
+if(input&&field[0]==="work_date")input.value=nowLocal("date");
+if(input&&field[0]==="breakdown_date")input.value=nowLocal();
+if(input&&field[0]==="maintenance_date")input.value=nowLocal("date");
+if(input&&field[0]==="duty_date")input.value=nowLocal("date");
+if(input&&field[0]==="inspection_date")input.value=nowLocal("date");
+if(input&&field[0]==="report_date")input.value=nowLocal("date");
+});
+
+$("entryForm").onsubmit=saveEntry;
 }
 
-async function saveProduction(event) {
-  event.preventDefault();
+async function saveEntry(event){
+event.preventDefault();
+const section=sections[activeView];
+if(!section||!currentUser)return;
 
-  if (!currentUser) {
-    say("productionMsg", "Please sign in again.");
-    return;
-  }
+const button=$("saveEntry");
+button.disabled=true;
+$("formMsg").textContent="Saving...";
 
-  const quantity = Number($("prodQuantity").value);
-  if (!Number.isFinite(quantity) || quantity <= 0) {
-    say("productionMsg", "Enter a quantity greater than zero.");
-    return;
-  }
-
-  const material = $("prodMaterial").value;
-  const customMaterial = material === "Other"
-    ? prompt("Enter the material name:")
-    : material;
-
-  if (!customMaterial || !customMaterial.trim()) {
-    say("productionMsg", "Please select or enter a material.");
-    return;
-  }
-
-  const record = {
-    material: customMaterial.trim(),
-    quantity_m3: quantity,
-    entered_by: currentUser.id,
-    machine_id: $("prodMachine").value.trim() || null,
-    start_time: $("prodStart").value || null,
-    end_time: $("prodEnd").value || null,
-    customer_or_destination: $("prodDestination").value.trim() || null
-  };
-
-  const dateValue = $("prodDate").value;
-  if (dateValue) {
-    const parsedDate = new Date(dateValue);
-    if (Number.isNaN(parsedDate.getTime())) {
-      say("productionMsg", "Please check the production date and time.");
-      return;
-    }
-    record.produced_at = parsedDate.toISOString();
-  }
-
-  const button = $("saveProduction");
-  button.disabled = true;
-  say("productionMsg", "Saving production to Supabase...");
-
-  try {
-    const { error } = await db.from("production_entries").insert(record);
-    if (error) throw error;
-
-    say("productionMsg",
-      "Production saved successfully. Stockpile movement should update automatically.");
-    $("productionForm").reset();
-    $("prodDate").value = localDateTimeValue();
-    await refreshDashboard();
-  } catch (error) {
-    say("productionMsg", "Save failed: " + error.message);
-  } finally {
-    button.disabled = false;
-  }
+const record={};
+for(const [name,label,type,options] of section.fields){
+const input=$("entryForm").elements[name];
+if(!input)continue;
+let value=input.value;
+if(value==="")value=null;
+if(type==="number"&&value!==null)value=Number(value);
+if((name==="produced_at"||name==="collected_at"||name==="log_date"||name==="breakdown_date")&&value){
+value=new Date(value).toISOString();
+}
+record[name]=value;
 }
 
-async function savePickup(event) {
-  event.preventDefault();
-
-  if (!currentUser) {
-    say("pickupMsg", "Please sign in again.");
-    return;
-  }
-
-  const quantity = Number($("pickupQuantity").value);
-  if (!Number.isFinite(quantity) || quantity <= 0) {
-    say("pickupMsg", "Enter a quantity greater than zero.");
-    return;
-  }
-
-  const material = $("pickupMaterial").value;
-  const customMaterial = material === "Other"
-    ? prompt("Enter the material name:")
-    : material;
-
-  if (!customMaterial || !customMaterial.trim()) {
-    say("pickupMsg", "Please select or enter a material.");
-    return;
-  }
-
-  const record = {
-    client_name: $("pickupClient").value.trim(),
-    material: customMaterial.trim(),
-    quantity_m3: quantity,
-    truck_registration: $("pickupTruck").value.trim() || null,
-    delivery_note_number: $("pickupNote").value.trim() || null,
-    notes: $("pickupNotes").value.trim() || null,
-    entered_by: currentUser.id
-  };
-
-  const button = $("savePickup");
-  button.disabled = true;
-  say("pickupMsg", "Saving customer pickup...");
-
-  try {
-    const { error } = await db.from("client_pickups").insert(record);
-    if (error) throw error;
-
-    say("pickupMsg", "Customer pickup saved successfully.");
-    $("pickupForm").reset();
-    await refreshDashboard();
-  } catch (error) {
-    say("pickupMsg", "Save failed: " + error.message);
-  } finally {
-    button.disabled = false;
-  }
+if(section.table==="production_entries"||section.table==="client_pickups"){
+record.entered_by=currentUser.id;
+}
+if(section.table==="production_entries"&&!record.material){
+$("formMsg").textContent="Please choose a material.";
+button.disabled=false;return;
+}
+if(section.table==="production_entries"&&record.material==="Other"){
+const material=prompt("Enter the material name:");
+if(!material){button.disabled=false;$("formMsg").textContent="Material is required.";return;}
+record.material=material;
 }
 
-async function showSession(session) {
-  currentUser = session ? session.user : null;
-  $("login").classList.toggle("hidden", !!session);
-  $("app").classList.toggle("hidden", !session);
-
-  if (session) {
-    say("welcome", "Signed in: " + (session.user.email || "Mine manager"));
-    say("today", "South Africa time: " +
-      new Date().toLocaleString("en-ZA", {
-        timeZone: "Africa/Johannesburg"
-      }));
-    $("prodDate").value = localDateTimeValue();
-    await refreshDashboard();
-    showView("production");
-  }
+try{
+const {error}=await db.from(section.table).insert(record);
+if(error)throw error;
+$("formMsg").textContent="Saved successfully.";
+$("entryForm").reset();
+await refreshDashboard();
+if(activeView==="report"){
+const report=record.report_text||"";
+if(report){
+const copyButton=document.createElement("button");
+copyButton.type="button";
+copyButton.textContent="Copy report for WhatsApp";
+copyButton.onclick=async()=>{
+try{await navigator.clipboard.writeText(report);$("formMsg").textContent="Report copied. Paste it into WhatsApp.";}
+catch(e){$("formMsg").textContent="Copy was blocked by the browser. Select the report in the saved records below and copy it manually.";}
+};
+$("entryForm").appendChild(copyButton);
+}
+}
+}catch(error){
+$("formMsg").textContent="Could not save: "+error.message+
+"\nThe form is opening, but the database may use different column names or permissions. Send me this exact error.";
+}finally{
+button.disabled=false;
+}
 }
 
-async function startApp() {
-  if (!window.supabase) {
-    say("loginMsg", "Supabase did not load. Check your internet and refresh.");
-    return;
-  }
+async function loadStockpiles(){
+$("recordsMsg").textContent="Loading current stock levels...";
+$("records").textContent="";
+try{
+const {data,error}=await db.from("stockpile_balances").select("*");
+if(error)throw error;
+$("recordsMsg").textContent="Current stockpile balances";
+$("records").textContent=data.length?JSON.stringify(data,null,2):"No stockpile records found yet.";
+}catch(error){
+$("recordsMsg").textContent="Could not load stockpiles: "+error.message;
+}
+}
 
-  try {
-    db = window.supabase.createClient(
-      SUPABASE_URL,
-      SUPABASE_PUBLISHABLE_KEY
-    );
+async function loadRecords(){
+if(activeView==="stockpiles"){await loadStockpiles();return;}
+const section=sections[activeView];
+if(!section)return;
+$("recordsMsg").textContent="Loading...";
+$("records").textContent="";
+try{
+const {data,error}=await db.from(section.table).select("*").limit(100);
+if(error)throw error;
+$("recordsMsg").textContent=data.length+" record(s) found.";
+$("records").textContent=JSON.stringify(data,null,2);
+}catch(error){
+$("recordsMsg").textContent="Could not load records: "+error.message;
+}
+}
 
-    $("loginForm").addEventListener("submit", async event => {
-      event.preventDefault();
-      const button = $("loginBtn");
-      button.disabled = true;
-      say("loginMsg", "Signing in...");
+async function refreshDashboard(){
+const checks=[
+["production_entries","productionCount"],
+["client_pickups","pickupCount"],
+["machine_breakdowns","breakdownCount"],
+["approval_requests","approvalCount"]
+];
+for(const [table,id] of checks){
+try{
+const {data,error}=await db.from(table).select("*").limit(500);
+if(error)throw error;
+if(table==="machine_breakdowns"){
+$(id).textContent=data.filter(r=>!["resolved","closed","completed"].includes(String(r.status||"").toLowerCase())).length;
+}else if(table==="approval_requests"){
+$(id).textContent=data.filter(r=>String(r.status||"").toLowerCase()==="pending").length;
+}else{
+$(id).textContent=data.length;
+}
+}catch(error){$(id).textContent="Error";console.error(table,error);}
+}
+}
 
-      try {
-        const { data, error } = await db.auth.signInWithPassword({
-          email: $("email").value.trim(),
-          password: $("password").value
-        });
-        if (error) throw error;
-        say("loginMsg", "");
-        await showSession(data.session);
-      } catch (error) {
-        say("loginMsg", "Sign-in failed: " + error.message);
-      } finally {
-        button.disabled = false;
-      }
-    });
+async function startApp(){
+if(!window.supabase){$("loginMsg").textContent="Supabase did not load. Check internet and refresh.";return;}
+try{
+db=window.supabase.createClient(SUPABASE_URL,SUPABASE_PUBLISHABLE_KEY);
+$("loginForm").addEventListener("submit",async event=>{
+event.preventDefault();
+$("loginBtn").disabled=true;
+$("loginMsg").textContent="Signing in...";
+try{
+const {data,error}=await db.auth.signInWithPassword({
+email:$("email").value.trim(),password:$("password").value
+});
+if(error)throw error;
+await setSession(data.session);
+$("loginMsg").textContent="";
+}catch(error){$("loginMsg").textContent="Sign-in failed: "+error.message;}
+finally{$("loginBtn").disabled=false;}
+});
 
-    $("productionForm").addEventListener("submit", saveProduction);
-    $("pickupForm").addEventListener("submit", savePickup);
+$("navigation").addEventListener("click",event=>{
+const button=event.target.closest("button[data-view]");
+if(button)showView(button.dataset.view);
+});
+$("homeBtn").onclick=()=>{
+$("home").classList.remove("hidden");
+$("entryPanel").classList.add("hidden");
+$("recordsPanel").classList.add("hidden");
+document.querySelectorAll("#navigation button").forEach(b=>b.classList.remove("active"));
+};
+$("refreshBtn").onclick=refreshDashboard;
+$("reloadRecords").onclick=loadRecords;
+$("logoutBtn").onclick=async()=>{
+const {error}=await db.auth.signOut();
+if(error){$("recordsMsg").textContent=error.message;return;}
+currentUser=null;
+$("app").classList.add("hidden");
+$("login").classList.remove("hidden");
+};
+const {data,error}=await db.auth.getSession();
+if(error)throw error;
+await setSession(data.session);
+}catch(error){$("loginMsg").textContent="App error: "+error.message;}
+}
 
-    $("navigation").addEventListener("click", event => {
-      const button = event.target.closest("button[data-view]");
-      if (button) showView(button.dataset.view);
-    });
-
-    $("refreshBtn").addEventListener("click", refreshDashboard);
-
-    $("logoutBtn").addEventListener("click", async () => {
-      const { error } = await db.auth.signOut();
-      if (error) {
-        say("status", "Sign-out failed: " + error.message);
-      } else {
-        currentUser = null;
-        $("app").classList.add("hidden");
-        $("login").classList.remove("hidden");
-        say("loginMsg", "You have signed out.");
-      }
-    });
-
-    const { data, error } = await db.auth.getSession();
-    if (error) throw error;
-    await showSession(data.session);
-  } catch (error) {
-    console.error("App startup error:", error);
-    say("loginMsg", "Startup error: " + error.message);
-  }
+async function setSession(session){
+currentUser=session?session.user:null;
+$("login").classList.toggle("hidden",!!session);
+$("app").classList.toggle("hidden",!session);
+if(session){
+$("welcome").textContent="Signed in: "+(session.user.email||"Manager");
+$("today").textContent=new Date().toLocaleString("en-ZA",{timeZone:"Africa/Johannesburg"});
+await refreshDashboard();
+showView("production");
+}
 }
 
 startApp();
