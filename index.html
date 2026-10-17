@@ -13,6 +13,7 @@
   --gold:#e5ad32;
   --text:#f4f6fa;
   --muted:#aab4c2;
+  --border:#354152;
 }
 * { box-sizing:border-box; }
 body {
@@ -24,70 +25,69 @@ body {
 header {
   padding:20px;
   background:#18212c;
-  border-bottom:2px solid var(--gold);
+  border-bottom:3px solid var(--gold);
 }
-h1 { margin:0;font-size:24px; }
-header p { margin:6px 0 0;color:var(--muted); }
-main { padding:16px;max-width:1100px;margin:auto; }
+h1 { margin:0; font-size:25px; }
+header p { color:var(--muted); margin:6px 0 0; }
+main { max-width:1100px; margin:auto; padding:16px; }
 .panel,.metric {
   background:var(--panel);
   padding:16px;
   border-radius:12px;
   margin-bottom:14px;
 }
-h2 { font-size:18px;margin-top:0; }
-input,button {
+h2 { font-size:19px; margin-top:0; }
+.small { color:var(--muted); font-size:13px; }
+input,select,textarea,button {
   width:100%;
-  padding:13px;
+  padding:12px;
   margin:6px 0;
   border-radius:8px;
   font-size:15px;
 }
-input {
+input,select,textarea {
   background:#10151d;
   color:white;
   border:1px solid #465263;
 }
+textarea { min-height:85px; resize:vertical; }
 button {
   background:var(--gold);
   border:0;
-  font-weight:bold;
   color:#151515;
+  font-weight:bold;
   cursor:pointer;
 }
-button:disabled { opacity:.6; }
-button.secondary { background:#354152;color:white; }
-.grid {
-  display:grid;
-  grid-template-columns:repeat(auto-fit,minmax(140px,1fr));
-  gap:10px;
-}
-.metric span {
-  display:block;
-  color:var(--muted);
-  font-size:13px;
-}
-.metric strong {
-  display:block;
-  font-size:25px;
-  margin-top:9px;
-  overflow-wrap:anywhere;
-}
+button:disabled { opacity:.55; }
+button.secondary { background:#354152; color:white; }
+button.active { outline:2px solid white; }
 nav {
-  display:flex;
-  gap:8px;
-  overflow-x:auto;
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:7px;
   margin:12px 0;
 }
-nav button { min-width:110px; }
+nav button { margin:0; min-height:46px; }
+.grid {
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:10px;
+}
+.metric span { color:var(--muted); font-size:13px; }
+.metric strong { display:block; font-size:25px; margin-top:8px; }
+.hidden { display:none!important; }
 pre {
   white-space:pre-wrap;
   overflow-wrap:anywhere;
-  color:#dbe4f0;
   font-size:12px;
+  color:#dbe4f0;
 }
-.small { color:var(--muted);font-size:13px; }
-.hidden { display:none!important; }
+.status { overflow-wrap:anywhere; }
+@media(min-width:700px) {
+  nav { grid-template-columns:repeat(4,minmax(0,1fr)); }
+  .grid { grid-template-columns:repeat(4,minmax(0,1fr)); }
+  .formgrid { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+}
 </style>
 </head>
 <body>
@@ -99,13 +99,15 @@ pre {
 <main>
   <section id="login" class="panel">
     <h2>Manager sign in</h2>
-    <p class="small">Sign in using your existing Supabase account.</p>
-    <input id="email" type="email"
-      placeholder="Email address" autocomplete="username">
-    <input id="password" type="password"
-      placeholder="Password" autocomplete="current-password">
-    <button id="loginBtn">Sign in</button>
-    <p id="loginMsg" class="small" role="status"></p>
+    <p class="small">Sign in with your existing Supabase account.</p>
+    <form id="loginForm">
+      <input id="email" type="email" placeholder="Email address"
+        autocomplete="username" required>
+      <input id="password" type="password" placeholder="Password"
+        autocomplete="current-password" required>
+      <button id="loginBtn" type="submit">Sign in</button>
+    </form>
+    <p id="loginMsg" class="small status" role="status"></p>
   </section>
 
   <section id="app" class="hidden">
@@ -119,41 +121,107 @@ pre {
     <div class="grid">
       <div class="metric">
         <span>Production entries</span>
-        <strong id="production">—</strong>
+        <strong id="productionCount">—</strong>
       </div>
       <div class="metric">
         <span>Customer pickups</span>
-        <strong id="pickups">—</strong>
+        <strong id="pickupCount">—</strong>
       </div>
       <div class="metric">
         <span>Open breakdowns</span>
-        <strong id="breakdowns">—</strong>
+        <strong id="breakdownCount">—</strong>
       </div>
       <div class="metric">
         <span>Pending approvals</span>
-        <strong id="approvals">—</strong>
+        <strong id="approvalCount">—</strong>
       </div>
     </div>
 
-    <nav>
-      <button data-table="stockpile_balances">Stockpiles</button>
-      <button data-table="daily_machine_hours">Machine hours</button>
-      <button data-table="machine_breakdowns">Breakdowns</button>
-      <button data-table="job_cards">Job cards</button>
-      <button data-table="diesel_logs">Diesel</button>
-      <button data-table="maintenance_records">Maintenance</button>
-      <button data-table="staff_duties">Staff duties</button>
-      <button data-table="safety_inspections">Safety</button>
-      <button data-table="approval_requests">Approvals</button>
-      <button data-table="daily_whatsapp_report">Daily report</button>
+    <nav id="navigation">
+      <button type="button" data-view="production">Production</button>
+      <button type="button" data-view="pickups">Customer pickups</button>
+      <button type="button" data-view="stockpile_balances">Stockpiles</button>
+      <button type="button" data-view="daily_machine_hours">Machine hours</button>
+      <button type="button" data-view="machine_breakdowns">Breakdowns</button>
+      <button type="button" data-view="job_cards">Job cards</button>
+      <button type="button" data-view="diesel_logs">Diesel</button>
+      <button type="button" data-view="maintenance_records">Maintenance</button>
+      <button type="button" data-view="staff_duties">Staff duties</button>
+      <button type="button" data-view="safety_inspections">Safety</button>
+      <button type="button" data-view="approval_requests">Approvals</button>
+      <button type="button" data-view="daily_whatsapp_report">Daily report</button>
     </nav>
 
-    <section class="panel">
-      <h2 id="sectionTitle">Dashboard information</h2>
-      <p id="status" class="small">
-        Choose a section or refresh the dashboard.
-      </p>
-      <pre id="results">Your mine records will appear here after sign-in.</pre>
+    <section id="productionPanel" class="panel hidden">
+      <h2>Record production</h2>
+      <p class="small">Record screened or washed sand produced.</p>
+      <form id="productionForm">
+        <label for="prodMaterial">Material</label>
+        <select id="prodMaterial" required>
+          <option value="">Choose material</option>
+          <option value="Building sand">Building sand</option>
+          <option value="Plaster sand">Plaster sand</option>
+          <option value="Other">Other</option>
+        </select>
+        <label for="prodQuantity">Quantity produced (m³)</label>
+        <input id="prodQuantity" type="number" min="0.01"
+          step="0.01" placeholder="e.g. 60" required>
+        <div class="formgrid">
+          <div>
+            <label for="prodMachine">Machine / plant</label>
+            <input id="prodMachine" placeholder="e.g. Screening plant">
+          </div>
+          <div>
+            <label for="prodStart">Start time</label>
+            <input id="prodStart" type="time">
+          </div>
+          <div>
+            <label for="prodEnd">End time</label>
+            <input id="prodEnd" type="time">
+          </div>
+          <div>
+            <label for="prodDate">Date and time</label>
+            <input id="prodDate" type="datetime-local">
+          </div>
+        </div>
+        <label for="prodDestination">Destination / notes</label>
+        <textarea id="prodDestination"
+          placeholder="Shift details, destination or other notes"></textarea>
+        <button id="saveProduction" type="submit">Save production</button>
+      </form>
+      <p id="productionMsg" class="small status" role="status"></p>
+    </section>
+
+    <section id="pickupsPanel" class="panel hidden">
+      <h2>Record customer pickup</h2>
+      <form id="pickupForm">
+        <label for="pickupClient">Customer name</label>
+        <input id="pickupClient" required placeholder="Customer / company">
+        <label for="pickupMaterial">Material collected</label>
+        <select id="pickupMaterial" required>
+          <option value="">Choose material</option>
+          <option value="Building sand">Building sand</option>
+          <option value="Plaster sand">Plaster sand</option>
+          <option value="Other">Other</option>
+        </select>
+        <label for="pickupQuantity">Quantity collected (m³)</label>
+        <input id="pickupQuantity" type="number" min="0.01"
+          step="0.01" required placeholder="e.g. 4">
+        <label for="pickupTruck">Truck registration</label>
+        <input id="pickupTruck" placeholder="Registration number">
+        <label for="pickupNote">Delivery note number</label>
+        <input id="pickupNote" placeholder="Optional">
+        <label for="pickupNotes">Notes</label>
+        <textarea id="pickupNotes" placeholder="Optional notes"></textarea>
+        <button id="savePickup" type="submit">Save customer pickup</button>
+      </form>
+      <p id="pickupMsg" class="small status" role="status"></p>
+    </section>
+
+    <section id="recordsPanel" class="panel hidden">
+      <h2 id="sectionTitle">Mine records</h2>
+      <p id="status" class="small status" role="status"></p>
+      <pre id="results"></pre>
     </section>
   </section>
 </main>
@@ -161,131 +229,251 @@ pre {
 <script>
 "use strict";
 
-const SUPABASE_URL =
-  "https://guintqihzpecbjvdgtdg.supabase.co";
-
-/* Keep your existing Supabase publishable key on this line. */
+const SUPABASE_URL = "https://guintqihzpecbjvdgtdg.supabase.co";
 const SUPABASE_PUBLISHABLE_KEY =
   "sb_publishable_ts9yQRmjpbnmxFAtukasYQ_7nacpxta";
 
 const $ = id => document.getElementById(id);
 
-const tables = {
-  stockpile_balances:"Stockpile balances",
-  daily_machine_hours:"Daily machine hours",
-  machine_breakdowns:"Machine breakdowns",
-  job_cards:"Job cards",
-  diesel_logs:"Diesel logs",
-  maintenance_records:"Maintenance records",
-  staff_duties:"Staff duties",
-  safety_inspections:"Safety inspections",
-  approval_requests:"Approval requests",
-  daily_whatsapp_report:"Daily WhatsApp report"
+const tableNames = {
+  stockpile_balances: "Stockpile balances",
+  daily_machine_hours: "Machine hours",
+  machine_breakdowns: "Breakdowns",
+  job_cards: "Job cards",
+  diesel_logs: "Diesel logs",
+  maintenance_records: "Maintenance",
+  staff_duties: "Staff duties",
+  safety_inspections: "Safety inspections",
+  approval_requests: "Approval requests",
+  daily_whatsapp_report: "Daily WhatsApp report"
 };
 
-function message(id, text) {
+let db;
+let currentUser = null;
+
+function say(id, text) {
   $(id).textContent = text;
 }
 
-let db;
+function localDateTimeValue() {
+  const now = new Date();
+  const offset = now.getTimezoneOffset() * 60000;
+  return new Date(now.getTime() - offset).toISOString().slice(0, 16);
+}
 
-function setLoggedIn(session) {
-  $("login").classList.toggle("hidden", !!session);
-  $("app").classList.toggle("hidden", !session);
+function showView(view) {
+  $("productionPanel").classList.toggle("hidden", view !== "production");
+  $("pickupsPanel").classList.toggle("hidden", view !== "pickups");
+  $("recordsPanel").classList.toggle(
+    "hidden", view === "production" || view === "pickups"
+  );
+
+  document.querySelectorAll("#navigation button").forEach(button => {
+    button.classList.toggle("active", button.dataset.view === view);
+  });
+
+  if (view === "production") {
+    $("productionForm").reset();
+    $("prodDate").value = localDateTimeValue();
+    say("productionMsg", "");
+  } else if (view === "pickups") {
+    $("pickupForm").reset();
+    say("pickupMsg", "");
+  } else if (tableNames[view]) {
+    loadTable(view);
+  }
 }
 
 async function refreshDashboard() {
-  message("status", "Loading mine data...");
+  say("status", "Refreshing dashboard...");
 
   const checks = [
-    ["production_entries", "production"],
-    ["client_pickups", "pickups"],
-    ["machine_breakdowns", "breakdowns"],
-    ["approval_requests", "approvals"]
+    ["production_entries", "productionCount"],
+    ["client_pickups", "pickupCount"],
+    ["machine_breakdowns", "breakdownCount"],
+    ["approval_requests", "approvalCount"]
   ];
 
   for (const [table, id] of checks) {
     try {
-      const { data, error } = await db
-        .from(table)
-        .select("*")
-        .limit(500);
-
+      const { data, error } = await db.from(table).select("*").limit(500);
       if (error) throw error;
 
-      if (id === "breakdowns") {
-        $(id).textContent = data.filter(r =>
+      if (table === "machine_breakdowns") {
+        $(id).textContent = data.filter(row =>
           !["resolved", "closed", "completed"].includes(
-            String(r.status || "").toLowerCase()
+            String(row.status || "").toLowerCase()
           )
         ).length;
-      } else if (id === "approvals") {
-        $(id).textContent = data.filter(r =>
-          String(r.status || "").toLowerCase() === "pending"
+      } else if (table === "approval_requests") {
+        $(id).textContent = data.filter(row =>
+          String(row.status || "").toLowerCase() === "pending"
         ).length;
       } else {
         $(id).textContent = data.length;
       }
     } catch (error) {
-      message(id, "Error");
-      console.error("Dashboard query failed:", table, error);
+      $(id).textContent = "Error";
+      console.error("Dashboard count error:", table, error);
     }
   }
 
-  message("status",
-    "Dashboard check complete. Select a section below.");
-}
-
-async function showSession(session) {
-  setLoggedIn(session);
-
-  if (session) {
-    message("welcome", "Signed in: " + session.user.email);
-    message("today", "South Africa time: " +
-      new Date().toLocaleString("en-ZA", {
-        timeZone:"Africa/Johannesburg"
-      }));
-
-    await refreshDashboard();
-  }
+  say("status", "Dashboard refreshed.");
 }
 
 async function loadTable(table) {
-  message("sectionTitle", tables[table] || table);
-  message("status", "Loading records...");
-  message("results", "");
+  say("sectionTitle", tableNames[table] || table);
+  say("status", "Loading records...");
+  say("results", "");
 
   try {
-    const { data, error } = await db
-      .from(table)
-      .select("*")
-      .limit(100);
-
+    const { data, error } = await db.from(table).select("*").limit(100);
     if (error) throw error;
 
-    message("status",
-      data.length + " record(s) returned. Maximum 100 shown.");
-    message("results", JSON.stringify(data, null, 2));
+    say("status", data.length + " record(s) found. Showing up to 100.");
+    say("results", JSON.stringify(data, null, 2));
   } catch (error) {
-    message("status", "Could not load this section.");
-    message("results", error.message || String(error));
+    say("status", "Could not load records: " + error.message);
+    say("results", "");
+  }
+}
+
+async function saveProduction(event) {
+  event.preventDefault();
+
+  if (!currentUser) {
+    say("productionMsg", "Please sign in again.");
+    return;
+  }
+
+  const quantity = Number($("prodQuantity").value);
+  if (!Number.isFinite(quantity) || quantity <= 0) {
+    say("productionMsg", "Enter a quantity greater than zero.");
+    return;
+  }
+
+  const material = $("prodMaterial").value;
+  const customMaterial = material === "Other"
+    ? prompt("Enter the material name:")
+    : material;
+
+  if (!customMaterial || !customMaterial.trim()) {
+    say("productionMsg", "Please select or enter a material.");
+    return;
+  }
+
+  const record = {
+    material: customMaterial.trim(),
+    quantity_m3: quantity,
+    entered_by: currentUser.id,
+    machine_id: $("prodMachine").value.trim() || null,
+    start_time: $("prodStart").value || null,
+    end_time: $("prodEnd").value || null,
+    customer_or_destination: $("prodDestination").value.trim() || null
+  };
+
+  const dateValue = $("prodDate").value;
+  if (dateValue) {
+    const parsedDate = new Date(dateValue);
+    if (Number.isNaN(parsedDate.getTime())) {
+      say("productionMsg", "Please check the production date and time.");
+      return;
+    }
+    record.produced_at = parsedDate.toISOString();
+  }
+
+  const button = $("saveProduction");
+  button.disabled = true;
+  say("productionMsg", "Saving production to Supabase...");
+
+  try {
+    const { error } = await db.from("production_entries").insert(record);
+    if (error) throw error;
+
+    say("productionMsg",
+      "Production saved successfully. Stockpile movement should update automatically.");
+    $("productionForm").reset();
+    $("prodDate").value = localDateTimeValue();
+    await refreshDashboard();
+  } catch (error) {
+    say("productionMsg", "Save failed: " + error.message);
+  } finally {
+    button.disabled = false;
+  }
+}
+
+async function savePickup(event) {
+  event.preventDefault();
+
+  if (!currentUser) {
+    say("pickupMsg", "Please sign in again.");
+    return;
+  }
+
+  const quantity = Number($("pickupQuantity").value);
+  if (!Number.isFinite(quantity) || quantity <= 0) {
+    say("pickupMsg", "Enter a quantity greater than zero.");
+    return;
+  }
+
+  const material = $("pickupMaterial").value;
+  const customMaterial = material === "Other"
+    ? prompt("Enter the material name:")
+    : material;
+
+  if (!customMaterial || !customMaterial.trim()) {
+    say("pickupMsg", "Please select or enter a material.");
+    return;
+  }
+
+  const record = {
+    client_name: $("pickupClient").value.trim(),
+    material: customMaterial.trim(),
+    quantity_m3: quantity,
+    truck_registration: $("pickupTruck").value.trim() || null,
+    delivery_note_number: $("pickupNote").value.trim() || null,
+    notes: $("pickupNotes").value.trim() || null,
+    entered_by: currentUser.id
+  };
+
+  const button = $("savePickup");
+  button.disabled = true;
+  say("pickupMsg", "Saving customer pickup...");
+
+  try {
+    const { error } = await db.from("client_pickups").insert(record);
+    if (error) throw error;
+
+    say("pickupMsg", "Customer pickup saved successfully.");
+    $("pickupForm").reset();
+    await refreshDashboard();
+  } catch (error) {
+    say("pickupMsg", "Save failed: " + error.message);
+  } finally {
+    button.disabled = false;
+  }
+}
+
+async function showSession(session) {
+  currentUser = session ? session.user : null;
+  $("login").classList.toggle("hidden", !!session);
+  $("app").classList.toggle("hidden", !session);
+
+  if (session) {
+    say("welcome", "Signed in: " + (session.user.email || "Mine manager"));
+    say("today", "South Africa time: " +
+      new Date().toLocaleString("en-ZA", {
+        timeZone: "Africa/Johannesburg"
+      }));
+    $("prodDate").value = localDateTimeValue();
+    await refreshDashboard();
+    showView("production");
   }
 }
 
 async function startApp() {
   if (!window.supabase) {
-    message("loginMsg",
-      "Could not load Supabase. Check your internet connection and refresh.");
-    return;
-  }
-
-  if (
-    !SUPABASE_PUBLISHABLE_KEY ||
-    SUPABASE_PUBLISHABLE_KEY.includes("YOUR_ACTUAL_KEY_HERE") ||
-    SUPABASE_PUBLISHABLE_KEY.includes("PASTE_YOUR")
-  ) {
-    message("loginMsg",
-      "Setup needed: check your Supabase publishable key.");
+    say("loginMsg", "Supabase did not load. Check your internet and refresh.");
     return;
   }
 
@@ -295,68 +483,55 @@ async function startApp() {
       SUPABASE_PUBLISHABLE_KEY
     );
 
-    $("loginBtn").addEventListener("click", async () => {
-      const email = $("email").value.trim();
-      const password = $("password").value;
+    $("loginForm").addEventListener("submit", async event => {
+      event.preventDefault();
       const button = $("loginBtn");
-
-      if (!email || !password) {
-        message("loginMsg", "Enter your email and password.");
-        return;
-      }
-
       button.disabled = true;
-      message("loginMsg", "Signing in...");
+      say("loginMsg", "Signing in...");
 
       try {
         const { data, error } = await db.auth.signInWithPassword({
-          email,
-          password
+          email: $("email").value.trim(),
+          password: $("password").value
         });
-
         if (error) throw error;
-
-        message("loginMsg", "");
+        say("loginMsg", "");
         await showSession(data.session);
       } catch (error) {
-        message("loginMsg",
-          error.message || "Sign-in failed. Please try again.");
+        say("loginMsg", "Sign-in failed: " + error.message);
       } finally {
         button.disabled = false;
       }
     });
 
-    $("logoutBtn").addEventListener("click", async () => {
-      message("status", "Signing out...");
+    $("productionForm").addEventListener("submit", saveProduction);
+    $("pickupForm").addEventListener("submit", savePickup);
 
-      const { error } = await db.auth.signOut();
-
-      if (error) {
-        message("status", error.message);
-      } else {
-        await showSession(null);
-        message("loginMsg", "You have signed out.");
-      }
+    $("navigation").addEventListener("click", event => {
+      const button = event.target.closest("button[data-view]");
+      if (button) showView(button.dataset.view);
     });
 
     $("refreshBtn").addEventListener("click", refreshDashboard);
 
-    document.querySelectorAll("nav button").forEach(button => {
-      button.addEventListener("click", () => {
-        loadTable(button.dataset.table);
-      });
+    $("logoutBtn").addEventListener("click", async () => {
+      const { error } = await db.auth.signOut();
+      if (error) {
+        say("status", "Sign-out failed: " + error.message);
+      } else {
+        currentUser = null;
+        $("app").classList.add("hidden");
+        $("login").classList.remove("hidden");
+        say("loginMsg", "You have signed out.");
+      }
     });
 
     const { data, error } = await db.auth.getSession();
-
     if (error) throw error;
-
     await showSession(data.session);
   } catch (error) {
-    console.error("501 Mining startup error:", error);
-    message("loginMsg",
-      "Dashboard startup error: " +
-      (error.message || String(error)));
+    console.error("App startup error:", error);
+    say("loginMsg", "Startup error: " + error.message);
   }
 }
 
