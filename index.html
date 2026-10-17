@@ -3,52 +3,46 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#10151d">
 <title>501 Mining | Mine Manager</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
-:root {
-  --bg:#10151d; --panel:#192230; --panel2:#202c3b;
-  --text:#f4f7fb; --muted:#aab6c6; --blue:#2878f0;
-  --border:#344255; --green:#26b879;
-}
+:root{--bg:#10151d;--panel:#192230;--panel2:#202c3b;--text:#f4f7fb;--muted:#aab6c6;--blue:#2878f0;--border:#344255;--green:#26b879}
 *{box-sizing:border-box}
 body{margin:0;background:var(--bg);color:var(--text);font-family:Arial,Helvetica,sans-serif}
-header{padding:18px 16px;background:#0b1017;border-bottom:2px solid var(--blue);position:sticky;top:0;z-index:5}
-.brand{font-size:22px;font-weight:800}
-.brand span{color:#4590ff}
-.subtitle,.muted{font-size:13px;color:var(--muted)}
+header{padding:17px;background:#0b1017;border-bottom:2px solid var(--blue);position:sticky;top:0;z-index:5}
+.brand{font-size:23px;font-weight:800}.brand span{color:#4590ff}
+.subtitle,.muted{color:var(--muted);font-size:13px}
 .subtitle{margin-top:5px}
-main{max-width:1150px;margin:auto;padding:16px}
-h2{font-size:21px;margin:8px 0 16px}
-h3{font-size:16px;margin:0 0 12px}
-.panel,.metric{background:var(--panel);border:1px solid var(--border);border-radius:13px;padding:16px;margin-bottom:15px}
-.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(145px,1fr));gap:12px;margin:16px 0}
-.metric{min-height:100px;margin:0}
-.metric-label{color:var(--muted);font-size:12px}
+main{max-width:1200px;margin:auto;padding:15px}
+h2{font-size:21px;margin:8px 0 15px}h3{font-size:16px;margin:0 0 12px}
+.panel,.metric{background:var(--panel);border:1px solid var(--border);border-radius:12px;padding:15px;margin-bottom:14px}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(145px,1fr));gap:12px;margin:14px 0}
+.metric{margin:0;min-height:105px}
+.metric-label{font-size:12px;color:var(--muted);letter-spacing:.3px}
 .metric-value{font-size:25px;font-weight:800;margin-top:12px;overflow-wrap:anywhere}
+.stock-value{color:#76b1ff}.production-value{color:#5ee0a4}
+nav{display:flex;gap:8px;overflow-x:auto;padding:12px 0 15px}
+nav button{white-space:nowrap;flex-shrink:0}
 button{border:0;border-radius:8px;padding:11px 14px;background:var(--blue);color:white;font-weight:700;cursor:pointer;font-size:14px}
 button:disabled{opacity:.55}
 button.secondary{background:var(--panel2);border:1px solid var(--border)}
-nav{display:flex;gap:8px;overflow-x:auto;padding:12px 0 15px}
-nav button{white-space:nowrap;flex-shrink:0}
 nav button.active{background:white;color:#10151d}
 input,select,textarea{width:100%;background:#0e141c;color:var(--text);border:1px solid var(--border);border-radius:8px;padding:11px;margin-top:6px;font-size:15px}
-textarea{min-height:85px;resize:vertical}
+textarea{min-height:80px;resize:vertical}
 label{display:block;font-size:13px;color:var(--muted);margin-bottom:12px}
 .form-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:4px 12px}
 .actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
 .status{padding:11px;border-radius:8px;margin:10px 0;white-space:pre-wrap;overflow-wrap:anywhere}
-.status.info{background:#1d3550}
-.status.ok{background:#123d2e}
-.status.error{background:#4b2024}
-.status.warn{background:#4a351c}
+.info{background:#1d3550}.ok{background:#123d2e}.error{background:#4b2024}.warn{background:#4a351c}
 .hidden{display:none!important}
 .list{display:grid;gap:10px}
 .record{background:#111923;border:1px solid var(--border);border-radius:9px;padding:12px;overflow-wrap:anywhere}
 .record-title{font-weight:700;margin-bottom:8px}
-footer{padding:22px;text-align:center;color:var(--muted);font-size:12px}
 .required{color:#ffb36b}
+.small-button{padding:7px 10px;font-size:12px}
+footer{text-align:center;padding:22px;color:var(--muted);font-size:12px}
 </style>
 </head>
 <body>
@@ -58,99 +52,122 @@ footer{padding:22px;text-align:center;color:var(--muted);font-size:12px}
 </header>
 
 <main>
-  <section id="loginPanel" class="panel">
-    <h2>Manager Login</h2>
-    <p class="muted">Sign in with your existing Supabase account.</p>
-    <form id="loginForm">
-      <label>Email address
-        <input id="email" type="email" autocomplete="username" required>
-      </label>
-      <label>Password
-        <input id="password" type="password" autocomplete="current-password" required>
-      </label>
-      <button id="loginButton" type="submit">Sign in</button>
-    </form>
-    <div id="loginMessage" class="status hidden"></div>
-  </section>
+<section id="loginPanel" class="panel">
+  <h2>Manager Login</h2>
+  <p class="muted">Sign in using your existing Supabase account.</p>
+  <form id="loginForm">
+    <label>Email address
+      <input id="email" type="email" autocomplete="username" required>
+    </label>
+    <label>Password
+      <input id="password" type="password" autocomplete="current-password" required>
+    </label>
+    <button id="loginButton" type="submit">Sign in</button>
+  </form>
+  <div id="loginMessage" class="status hidden"></div>
+</section>
 
-  <section id="appPanel" class="hidden">
-    <div class="panel">
-      <div class="muted">SIGNED-IN USER</div>
-      <div id="userEmail" style="font-weight:700;margin-top:5px"></div>
-      <div class="actions">
-        <button class="secondary" id="refreshButton" type="button">Refresh data</button>
-        <button class="secondary" id="logoutButton" type="button">Sign out</button>
+<section id="appPanel" class="hidden">
+  <div class="panel">
+    <div class="muted">SIGNED-IN ACCOUNT</div>
+    <div id="userEmail" style="margin:6px 0;font-weight:700"></div>
+    <div class="actions">
+      <button id="refreshButton" class="secondary" type="button">Refresh dashboard</button>
+      <button id="logoutButton" class="secondary" type="button">Sign out</button>
+    </div>
+    <div id="globalMessage" class="status hidden"></div>
+  </div>
+
+  <nav id="navigation">
+    <button class="active" data-page="home">Home</button>
+    <button data-page="production">Production</button>
+    <button data-page="pickups">Client pickups</button>
+    <button data-page="hours">Machine hours</button>
+    <button data-page="breakdowns">Breakdowns</button>
+    <button data-page="jobs">Job cards</button>
+    <button data-page="diesel">Diesel</button>
+    <button data-page="maintenance">Maintenance</button>
+    <button data-page="duties">Staff duties</button>
+    <button data-page="safety">Safety</button>
+    <button data-page="approvals">Approvals</button>
+    <button data-page="reports">Daily reports</button>
+  </nav>
+
+  <section id="page-home" class="page">
+    <h2>Mine Overview</h2>
+    <p class="muted" id="dashboardDate">Today's production and available stock</p>
+
+    <div class="grid">
+      <div class="metric">
+        <div class="metric-label">BUILDING SAND STOCK</div>
+        <div id="buildingStock" class="metric-value stock-value">—</div>
+        <div class="muted">Cubes currently available</div>
       </div>
-      <div id="globalMessage" class="status hidden"></div>
+      <div class="metric">
+        <div class="metric-label">PLASTER SAND STOCK</div>
+        <div id="plasterStock" class="metric-value stock-value">—</div>
+        <div class="muted">Cubes currently available</div>
+      </div>
+      <div class="metric">
+        <div class="metric-label">BUILDING SAND TODAY</div>
+        <div id="buildingProduced" class="metric-value production-value">—</div>
+        <div class="muted">Cubes produced today</div>
+      </div>
+      <div class="metric">
+        <div class="metric-label">PLASTER SAND TODAY</div>
+        <div id="plasterProduced" class="metric-value production-value">—</div>
+        <div class="muted">Cubes produced today</div>
+      </div>
     </div>
 
-    <nav id="navigation">
-      <button class="active" data-page="home">Stockpile</button>
-      <button data-page="production">Production</button>
-      <button data-page="pickups">Client pickups</button>
-      <button data-page="hours">Machine hours</button>
-      <button data-page="breakdowns">Breakdowns</button>
-      <button data-page="jobs">Job cards</button>
-      <button data-page="diesel">Diesel</button>
-      <button data-page="maintenance">Maintenance</button>
-      <button data-page="duties">Staff duties</button>
-      <button data-page="safety">Safety</button>
-      <button data-page="approvals">Approvals</button>
-      <button data-page="reports">Daily reports</button>
-    </nav>
+    <div class="panel">
+      <div class="metric-label">TOTAL SAND PRODUCED TODAY</div>
+      <div id="totalProduced" class="metric-value production-value">—</div>
+      <p class="muted">Daily production is counted separately from client pickups.</p>
+      <div id="productionStatus" class="status hidden"></div>
+    </div>
 
-    <section id="page-home" class="page">
-      <h2>Stockpile dashboard</h2>
-      <p class="muted">Stock balances are read from your Supabase database.</p>
+    <div class="panel">
+      <h3>Daily activity</h3>
       <div class="grid">
         <div class="metric">
-          <div class="metric-label">Total sand stock</div>
-          <div id="stockAmount" class="metric-value">Loading...</div>
-        </div>
-        <div class="metric">
-          <div class="metric-label">Production entries</div>
+          <div class="metric-label">PRODUCTION ENTRIES</div>
           <div id="productionCount" class="metric-value">—</div>
         </div>
         <div class="metric">
-          <div class="metric-label">Client pickups</div>
+          <div class="metric-label">CLIENT PICKUPS</div>
           <div id="pickupCount" class="metric-value">—</div>
         </div>
         <div class="metric">
-          <div class="metric-label">Open breakdowns</div>
+          <div class="metric-label">OPEN BREAKDOWNS</div>
           <div id="breakdownCount" class="metric-value">—</div>
         </div>
         <div class="metric">
-          <div class="metric-label">Pending approvals</div>
+          <div class="metric-label">PENDING APPROVALS</div>
           <div id="approvalCount" class="metric-value">—</div>
         </div>
       </div>
-      <div class="panel">
-        <h3>Individual stockpiles</h3>
-        <div id="stockpileList" class="list">Loading stockpiles...</div>
-        <div id="stockpileMessage" class="status hidden"></div>
-      </div>
-      <div class="panel">
-        <h3>Automatic stock control</h3>
-        <p class="muted">
-          Saving production should increase the selected sand stockpile.
-          Saving a client pickup should deduct the quantity collected.
-          Existing database triggers handle these changes.
-        </p>
-      </div>
-    </section>
+    </div>
 
-    <section id="page-production" class="page hidden"></section>
-    <section id="page-pickups" class="page hidden"></section>
-    <section id="page-hours" class="page hidden"></section>
-    <section id="page-breakdowns" class="page hidden"></section>
-    <section id="page-jobs" class="page hidden"></section>
-    <section id="page-diesel" class="page hidden"></section>
-    <section id="page-maintenance" class="page hidden"></section>
-    <section id="page-duties" class="page hidden"></section>
-    <section id="page-safety" class="page hidden"></section>
-    <section id="page-approvals" class="page hidden"></section>
-    <section id="page-reports" class="page hidden"></section>
+    <div class="panel">
+      <h3>Stockpile details</h3>
+      <div id="stockpileList" class="list">Loading stockpiles...</div>
+      <div id="stockpileMessage" class="status hidden"></div>
+    </div>
   </section>
+
+  <section id="page-production" class="page hidden"></section>
+  <section id="page-pickups" class="page hidden"></section>
+  <section id="page-hours" class="page hidden"></section>
+  <section id="page-breakdowns" class="page hidden"></section>
+  <section id="page-jobs" class="page hidden"></section>
+  <section id="page-diesel" class="page hidden"></section>
+  <section id="page-maintenance" class="page hidden"></section>
+  <section id="page-duties" class="page hidden"></section>
+  <section id="page-safety" class="page hidden"></section>
+  <section id="page-approvals" class="page hidden"></section>
+  <section id="page-reports" class="page hidden"></section>
+</section>
 </main>
 
 <footer>501 Mining · Mine Manager System</footer>
@@ -160,6 +177,18 @@ const SUPABASE_URL = "https://guintqihzpecbjvdgtdg.supabase.co";
 const SUPABASE_KEY = "sb_publishable_ts9yQRmjpbnmxFAtukasYQ_7nacpxta";
 const db = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
+/*
+  These are the known machines/equipment from the mine details.
+  Change these labels if your official fleet names differ.
+  Values are machine names, not invented database UUIDs.
+*/
+const machines = [
+  "Caterpillar 416D TLB",
+  "Mercedes-Benz Axor 3335 Truck",
+  "Bobcat 753",
+  "Other machine / vehicle"
+];
+
 const definitions = {
   production: {
     table: "production_entries",
@@ -168,14 +197,9 @@ const definitions = {
       ["produced_at","Production date and time","datetime-local",true],
       ["material","Sand type","select",true,["Building Sand","Plaster Sand"]],
       ["quantity_m3","Quantity produced (cubes)","number",true],
-      ["start_time","Start time","time"],
-      ["end_time","End time","time"],
-      ["machine_id","Machine","text"],
-      ["customer_or_destination","Destination / notes for customer","text"],
       ["notes","Notes","textarea"]
     ]
   },
-
   pickups: {
     table: "client_pickups",
     title: "Client pickups",
@@ -189,13 +213,12 @@ const definitions = {
       ["notes","Notes","textarea"]
     ]
   },
-
   hours: {
     table: "daily_machine_hours",
     title: "Machine hours",
     fields: [
       ["work_date","Work date","date",true],
-      ["machine_name","Machine","text",true],
+      ["machine_name","Machine","machine",true],
       ["start_hours","Starting hours","number",true],
       ["end_hours","Ending hours","number",true],
       ["hours_worked","Hours worked","number"],
@@ -203,13 +226,12 @@ const definitions = {
       ["notes","Notes","textarea"]
     ]
   },
-
   breakdowns: {
     table: "machine_breakdowns",
     title: "Breakdowns",
     fields: [
       ["breakdown_date","Breakdown date","date",true],
-      ["machine_name","Machine","text",true],
+      ["machine_name","Machine","machine",true],
       ["problem","Problem / fault","textarea",true],
       ["action_taken","Action taken","textarea"],
       ["downtime_hours","Downtime (hours)","number"],
@@ -217,13 +239,12 @@ const definitions = {
       ["notes","Notes","textarea"]
     ]
   },
-
   jobs: {
     table: "job_cards",
     title: "Job cards",
     fields: [
       ["job_date","Job date","date",true],
-      ["machine_name","Machine","text",true],
+      ["machine_name","Machine","machine",true],
       ["job_description","Job description","textarea",true],
       ["priority","Priority","select",true,["Low","Normal","High","Urgent"]],
       ["assigned_to","Assigned to","text"],
@@ -232,26 +253,24 @@ const definitions = {
       ["notes","Notes","textarea"]
     ]
   },
-
   diesel: {
     table: "diesel_logs",
     title: "Diesel",
     fields: [
       ["log_date","Date","date",true],
-      ["machine_name","Machine","text",true],
-      ["litres","Litres","number",true],
+      ["machine_name","Machine / vehicle","machine",true],
+      ["litres","Litres issued","number",true],
       ["cost","Cost (R)","number"],
-      ["supplied_by","Supplied by","text"],
+      ["supplied_by","Issued by","text"],
       ["notes","Notes","textarea"]
     ]
   },
-
   maintenance: {
     table: "maintenance_records",
     title: "Maintenance",
     fields: [
       ["maintenance_date","Maintenance date","date",true],
-      ["machine_name","Machine","text",true],
+      ["machine_name","Machine","machine",true],
       ["maintenance_type","Maintenance type","text",true],
       ["description","Work completed / required","textarea",true],
       ["next_service_hours","Next service hours","number"],
@@ -259,7 +278,6 @@ const definitions = {
       ["notes","Notes","textarea"]
     ]
   },
-
   duties: {
     table: "staff_duties",
     title: "Staff duties",
@@ -271,7 +289,6 @@ const definitions = {
       ["notes","Notes","textarea"]
     ]
   },
-
   safety: {
     table: "safety_inspections",
     title: "Safety inspections",
@@ -285,7 +302,6 @@ const definitions = {
       ["notes","Notes","textarea"]
     ]
   },
-
   approvals: {
     table: "approval_requests",
     title: "Approval requests",
@@ -300,7 +316,6 @@ const definitions = {
       ["review_notes","Review notes","textarea"]
     ]
   },
-
   reports: {
     table: "daily_whatsapp_report",
     title: "Daily WhatsApp reports",
@@ -314,77 +329,82 @@ const definitions = {
 };
 
 const $ = id => document.getElementById(id);
-const today = () => {
+
+function localDate() {
   const d = new Date();
   d.setMinutes(d.getMinutes() - d.getTimezoneOffset());
   return d.toISOString().slice(0,10);
-};
-const localDateTime = () => {
+}
+
+function localDateTime() {
   const d = new Date();
   d.setMinutes(d.getMinutes() - d.getTimezoneOffset());
   return d.toISOString().slice(0,16);
-};
+}
 
-function safeText(value) {
-  return String(value ?? "").replace(/[&<>"']/g,c=>({
-    "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"
+function esc(value) {
+  return String(value ?? "").replace(/[&<>"']/g, c => ({
+    "&":"&amp;", "<":"&lt;", ">":"&gt;", '"':"&quot;", "'":"&#39;"
   })[c]);
 }
 
-function numberText(value) {
-  const n = Number(value);
-  return Number.isFinite(n)
-    ? n.toLocaleString("en-ZA",{maximumFractionDigits:2})
-    : "—";
+function fmt(value) {
+  return Number(value).toLocaleString("en-ZA", {
+    maximumFractionDigits:2
+  });
 }
 
-function showMessage(target,message,type="info") {
-  target.textContent = message;
-  target.className = "status " + type;
-}
-function hideMessage(target) {
-  target.textContent = "";
-  target.className = "status hidden";
+function showMessage(element,message,type="info") {
+  element.textContent = message;
+  element.className = "status " + type;
 }
 
-function makeField(field,index,prefix) {
+function hideMessage(element) {
+  element.textContent = "";
+  element.className = "status hidden";
+}
+
+function makeField(field,index,key) {
   const [name,label,type,required,options] = field;
-  const id = prefix + "_" + index;
-  const requiredAttr = required ? " required" : "";
-  const labelText = safeText(label) +
-    (required ? ' <span class="required">*</span>' : "");
+  const id = key + "_" + index;
+  const req = required ? " required" : "";
   let control = "";
 
   if (type === "textarea") {
-    control = `<textarea id="${id}" name="${name}"${requiredAttr}></textarea>`;
+    control = `<textarea id="${id}" name="${name}"${req}></textarea>`;
+  } else if (type === "machine") {
+    control = `<select id="${id}" name="${name}"${req}>
+      <option value="">Select a machine / vehicle</option>
+      ${machines.map(m => `<option value="${esc(m)}">${esc(m)}</option>`).join("")}
+    </select>`;
   } else if (type === "select") {
-    control = `<select id="${id}" name="${name}"${requiredAttr}>
+    control = `<select id="${id}" name="${name}"${req}>
       <option value="">Choose an option</option>
-      ${options.map(o=>`<option value="${safeText(o)}">${safeText(o)}</option>`).join("")}
+      ${options.map(o => `<option value="${esc(o)}">${esc(o)}</option>`).join("")}
     </select>`;
   } else {
     let value = "";
-    if (type === "date") value = ` value="${today()}"`;
+    if (type === "date") value = ` value="${localDate()}"`;
     if (type === "datetime-local") value = ` value="${localDateTime()}"`;
     const step = type === "number" ? ' step="any" min="0"' : "";
-    control = `<input id="${id}" name="${name}" type="${type}"${value}${step}${requiredAttr}>`;
+    control = `<input id="${id}" name="${name}" type="${type}"${value}${step}${req}>`;
   }
 
-  return `<label for="${id}">${labelText}${control}</label>`;
+  return `<label for="${id}">${esc(label)}${required ? ' <span class="required">*</span>' : ""}${control}</label>`;
 }
 
 function buildSection(key,config) {
   const root = $("page-" + key);
   root.innerHTML = `
-    <h2>${safeText(config.title)}</h2>
+    <h2>${esc(config.title)}</h2>
     <div class="panel">
       <h3>Add new record</h3>
       <form id="form-${key}">
         <div class="form-grid">
-          ${config.fields.map((field,index)=>makeField(field,index,key)).join("")}
+          ${config.fields.map((field,index) => makeField(field,index,key)).join("")}
         </div>
         <div class="actions">
-          <button type="submit">Save ${safeText(config.title.toLowerCase())}</button>
+          <button type="submit">Save ${esc(config.title.toLowerCase())}</button>
           <button class="secondary" type="reset">Clear form</button>
         </div>
       </form>
@@ -396,17 +416,16 @@ function buildSection(key,config) {
       <div class="actions">
         <button type="button" class="secondary" id="reload-${key}">Refresh records</button>
       </div>
-    </div>
-  `;
+    </div>`;
 
-  $("form-" + key).addEventListener("submit",event=>saveRecord(event,key,config));
-  $("form-" + key).addEventListener("reset",()=>{
-    setTimeout(()=>{
-      root.querySelectorAll('input[type="date"]').forEach(el=>el.value=today());
-      root.querySelectorAll('input[type="datetime-local"]').forEach(el=>el.value=localDateTime());
+  $("form-" + key).addEventListener("submit",e => saveRecord(e,key,config));
+  $("form-" + key).addEventListener("reset",() => {
+    setTimeout(() => {
+      root.querySelectorAll('input[type="date"]').forEach(el => el.value = localDate());
+      root.querySelectorAll('input[type="datetime-local"]').forEach(el => el.value = localDateTime());
     },0);
   });
-  $("reload-" + key).addEventListener("click",()=>loadRecords(key,config));
+  $("reload-" + key).addEventListener("click",() => loadRecords(key,config));
 }
 
 async function saveRecord(event,key,config) {
@@ -419,15 +438,14 @@ async function saveRecord(event,key,config) {
   for (const [name,label,type,required] of config.fields) {
     const control = form.elements.namedItem(name);
     if (!control) continue;
-
     const raw = control.value.trim();
 
-    if (required && raw === "") {
-      showMessage(message,"Please complete the required field: " + label,"warn");
+    if (required && !raw) {
+      showMessage(message,"Please complete: " + label,"warn");
       control.focus();
       return;
     }
-    if (raw === "") continue;
+    if (!raw) continue;
 
     if (type === "number") {
       const n = Number(raw);
@@ -440,7 +458,7 @@ async function saveRecord(event,key,config) {
     } else if (type === "datetime-local") {
       const date = new Date(raw);
       if (Number.isNaN(date.getTime())) {
-        showMessage(message,"Select a valid date and time for " + label,"warn");
+        showMessage(message,"Enter a valid date and time.","warn");
         return;
       }
       payload[name] = date.toISOString();
@@ -449,20 +467,22 @@ async function saveRecord(event,key,config) {
     }
   }
 
-  // Save the signed-in user's email when the table supports this text field.
-  // The dashboard does not send any service-role key to the browser.
-  const {data:authData} = await db.auth.getUser();
-  const user = authData?.user;
-
-  if (user && ["production_entries","client_pickups","stockpile_movements"].includes(config.table)) {
-    payload.entered_by = user.email || user.id;
-  }
-
   button.disabled = true;
   button.textContent = "Saving...";
   hideMessage(message);
 
   try {
+    const {data:authData,error:authError} = await db.auth.getUser();
+    if (authError) throw authError;
+
+    const user = authData?.user;
+
+    // UUID columns must receive the authenticated user's UUID, not email.
+    // Do not send entered_by until the signed-in user is available.
+    if (user && ["production_entries","client_pickups"].includes(config.table)) {
+      payload.entered_by = user.id;
+    }
+
     const {error} = await db.from(config.table).insert(payload);
     if (error) throw error;
 
@@ -474,7 +494,7 @@ async function saveRecord(event,key,config) {
     showMessage(message,
       "Could not save to " + config.table + ".\n" +
       (error.message || String(error)) +
-      "\n\nCheck the table columns and Supabase permissions. If the error mentions row-level security, the table's INSERT policy must allow your signed-in account.",
+      "\n\nIf this mentions a missing column or row-level security, the database schema or permissions need to be checked.",
       "error");
   } finally {
     button.disabled = false;
@@ -487,11 +507,7 @@ async function loadRecords(key,config) {
   container.textContent = "Loading records...";
 
   try {
-    const {data,error} = await db
-      .from(config.table)
-      .select("*")
-      .limit(20);
-
+    const {data,error} = await db.from(config.table).select("*").limit(20);
     if (error) throw error;
 
     if (!data || data.length === 0) {
@@ -499,152 +515,202 @@ async function loadRecords(key,config) {
       return;
     }
 
-    container.innerHTML = data.map((row,index)=>{
-      const entries = Object.entries(row)
-        .filter(([name])=>name !== "id")
-        .slice(0,14)
-        .map(([name,value])=>
-          `<div><span class="muted">${safeText(name.replaceAll("_"," "))}:</span> ${safeText(value)}</div>`
-        ).join("");
-
+    container.innerHTML = data.map((row,index) => {
       const title = row.client_name
         ? "Client: " + row.client_name
-        : row.machine_name
-          ? row.machine_name
-          : row.material
-            ? row.material
-            : "Record " + (index+1);
+        : row.machine_name || row.material || ("Record " + (index+1));
+
+      const details = Object.entries(row)
+        .filter(([name]) => name !== "id")
+        .slice(0,16)
+        .map(([name,value]) =>
+          `<div><span class="muted">${esc(name.replaceAll("_"," "))}:</span> ${esc(value)}</div>`
+        ).join("");
 
       return `<div class="record">
-        <div class="record-title">${safeText(title)}</div>
-        ${entries}
+        <div class="record-title">${esc(title)}</div>
+        ${details}
       </div>`;
     }).join("");
   } catch (error) {
     container.innerHTML = "";
     showMessage($("message-" + key),
-      "Could not load " + config.table + ".\n" +
-      (error.message || String(error)),"error");
+      "Could not load " + config.table + ".\n" + (error.message || String(error)),
+      "error");
   }
+}
+
+function materialName(row) {
+  const key = ["material","sand_type","product","stockpile_name","name"]
+    .find(k => row[k] !== undefined && row[k] !== null);
+  return key ? String(row[key]).toLowerCase() : "";
+}
+
+function stockQuantity(row) {
+  const key = [
+    "current_stock_m3","balance_m3","quantity_m3",
+    "balance","quantity","current_stock","stock_quantity"
+  ].find(k => row[k] !== undefined && row[k] !== null);
+  return key ? Number(row[key]) : NaN;
 }
 
 async function loadStockpile() {
-  const amount = $("stockAmount");
   const list = $("stockpileList");
   const message = $("stockpileMessage");
 
-  amount.textContent = "Loading...";
-  list.textContent = "Loading stockpiles...";
   hideMessage(message);
 
   try {
-    const {data,error} = await db
-      .from("stockpile_balances")
-      .select("*")
-      .limit(100);
-
+    const {data,error} = await db.from("stockpile_balances").select("*");
     if (error) throw error;
 
-    if (!data || data.length === 0) {
-      amount.textContent = "0 cubes";
-      list.innerHTML = '<div class="muted">No stockpile balances found.</div>';
+    const rows = data || [];
+
+    function findMaterialStock(term) {
+      const matches = rows.filter(row => materialName(row).includes(term));
+      if (!matches.length) return null;
+
+      const values = matches.map(stockQuantity);
+      if (values.some(v => !Number.isFinite(v))) return null;
+
+      return values.reduce((sum,v) => sum + v,0);
+    }
+
+    const building = findMaterialStock("building");
+    const plaster = findMaterialStock("plaster");
+
+    $("buildingStock").textContent = building === null
+      ? "Check database" : fmt(building) + " m³";
+
+    $("plasterStock").textContent = plaster === null
+      ? "Check database" : fmt(plaster) + " m³";
+
+    if (!rows.length) {
+      list.innerHTML = '<div class="muted">No stockpile rows found.</div>';
       return;
     }
 
-    let total = 0;
-    let totalFound = false;
-
-    const cards = data.map(row=>{
-      const qtyKey = [
-        "current_stock_m3","balance_m3","quantity_m3",
-        "balance","quantity","current_stock","stock_quantity"
-      ].find(key=>row[key] !== undefined && row[key] !== null);
-
-      const nameKey = [
-        "material","sand_type","product","stockpile_name","name"
-      ].find(key=>row[key] !== undefined && row[key] !== null);
-
-      const qty = qtyKey ? Number(row[qtyKey]) : NaN;
-      const name = nameKey ? row[nameKey] : "Sand stockpile";
-
-      if (Number.isFinite(qty)) {
-        total += qty;
-        totalFound = true;
-      }
-
+    list.innerHTML = rows.map(row => {
+      const name = materialName(row) || "Sand stockpile";
+      const quantity = stockQuantity(row);
       return `<div class="record">
-        <div class="record-title">${safeText(name)}</div>
-        <div class="metric-value">${
-          qtyKey && Number.isFinite(qty)
-            ? safeText(numberText(qty) + " cubes")
-            : "Amount unavailable"
-        }</div>
+        <div class="record-title">${esc(name)}</div>
+        <div class="metric-value">${Number.isFinite(quantity) ? esc(fmt(quantity)) + " m³" : "Quantity unavailable"}</div>
       </div>`;
     }).join("");
 
-    amount.textContent = totalFound ? numberText(total) + " cubes" : "Unavailable";
-    list.innerHTML = cards;
-
-    if (!totalFound) {
+    if (building === null || plaster === null) {
       showMessage(message,
-        "Stockpile rows loaded, but the quantity column was not recognised.",
+        "At least one sand stockpile was not matched. Check the material names and quantity column in stockpile_balances.",
         "warn");
     }
   } catch (error) {
-    amount.textContent = "Unavailable";
+    $("buildingStock").textContent = "Unavailable";
+    $("plasterStock").textContent = "Unavailable";
     list.innerHTML = "";
-    showMessage(message,
-      "Could not load stockpile balances.\n" +
-      (error.message || String(error)),"error");
+    showMessage(message,"Could not load stockpiles: " + (error.message || String(error)),"error");
   }
 }
 
-async function countRows(table,elementId,filterFn) {
+async function loadDailyProduction() {
+  const status = $("productionStatus");
+  hideMessage(status);
+
+  const now = new Date();
+  const start = new Date(now.getFullYear(),now.getMonth(),now.getDate());
+  const end = new Date(now.getFullYear(),now.getMonth(),now.getDate()+1);
+
+  $("dashboardDate").textContent =
+    "Today's production · " + start.toLocaleDateString("en-ZA");
+
+  try {
+    const {data,error} = await db
+      .from("production_entries")
+      .select("produced_at,material,quantity_m3")
+      .gte("produced_at",start.toISOString())
+      .lt("produced_at",end.toISOString());
+
+    if (error) throw error;
+
+    let building = 0;
+    let plaster = 0;
+
+    for (const row of data || []) {
+      const material = String(row.material || "").toLowerCase();
+      const quantity = Number(row.quantity_m3);
+
+      if (!Number.isFinite(quantity)) continue;
+
+      if (material.includes("building")) building += quantity;
+      if (material.includes("plaster")) plaster += quantity;
+    }
+
+    $("buildingProduced").textContent = fmt(building) + " m³";
+    $("plasterProduced").textContent = fmt(plaster) + " m³";
+    $("totalProduced").textContent = fmt(building + plaster) + " m³";
+  } catch (error) {
+    $("buildingProduced").textContent = "Unavailable";
+    $("plasterProduced").textContent = "Unavailable";
+    $("totalProduced").textContent = "Unavailable";
+
+    showMessage(status,
+      "Could not calculate today's production. Check the produced_at, material and quantity_m3 columns. " +
+      (error.message || String(error)),
+      "error");
+  }
+}
+
+async function countRows(table,elementId,filter) {
   try {
     const {data,error} = await db.from(table).select("*").limit(500);
     if (error) throw error;
+
     const rows = data || [];
-    $(elementId).textContent = String(
-      filterFn ? rows.filter(filterFn).length : rows.length
-    );
+    $(elementId).textContent = String(filter ? rows.filter(filter).length : rows.length);
   } catch {
     $(elementId).textContent = "—";
   }
 }
 
 async function refreshDashboard() {
-  await loadStockpile();
-
   await Promise.all([
+    loadStockpile(),
+    loadDailyProduction(),
     countRows("production_entries","productionCount"),
     countRows("client_pickups","pickupCount"),
-    countRows("machine_breakdowns","breakdownCount",row=>{
-      const s = String(row.status || "").toLowerCase();
-      return !["completed","closed","resolved"].includes(s);
-    }),
-    countRows("approval_requests","approvalCount",row=>
+    countRows("machine_breakdowns","breakdownCount",row =>
+      !["completed","closed","resolved"].includes(
+        String(row.status || "").toLowerCase()
+      )
+    ),
+    countRows("approval_requests","approvalCount",row =>
       String(row.status || "pending").toLowerCase() === "pending"
     )
   ]);
 }
 
 function showPage(key) {
-  document.querySelectorAll(".page").forEach(p=>p.classList.add("hidden"));
+  document.querySelectorAll(".page").forEach(page => page.classList.add("hidden"));
   $("page-" + key).classList.remove("hidden");
 
-  document.querySelectorAll("#navigation button").forEach(button=>{
-    button.classList.toggle("active",button.dataset.page===key);
+  document.querySelectorAll("#navigation button").forEach(button => {
+    button.classList.toggle("active",button.dataset.page === key);
   });
 
   if (key === "home") refreshDashboard();
   if (definitions[key]) loadRecords(key,definitions[key]);
 }
 
-Object.entries(definitions).forEach(([key,config])=>buildSection(key,config));
+Object.entries(definitions).forEach(([key,config]) => buildSection(key,config));
 
-document.querySelectorAll("#navigation button").forEach(button=>{
-  button.addEventListener("click",()=>showPage(button.dataset.page));
+document.querySelectorAll("#navigation button").forEach(button => {
+  button.addEventListener("click",() => showPage(button.dataset.page));
 });
+
+function showLogin() {
+  $("appPanel").classList.add("hidden");
+  $("loginPanel").classList.remove("hidden");
+}
 
 async function showApp(session) {
   if (!session) return;
@@ -655,12 +721,7 @@ async function showApp(session) {
   await refreshDashboard();
 }
 
-function showLogin() {
-  $("appPanel").classList.add("hidden");
-  $("loginPanel").classList.remove("hidden");
-}
-
-$("loginForm").addEventListener("submit",async event=>{
+$("loginForm").addEventListener("submit",async event => {
   event.preventDefault();
   const button = $("loginButton");
   const message = $("loginMessage");
@@ -684,19 +745,19 @@ $("loginForm").addEventListener("submit",async event=>{
   }
 });
 
-$("logoutButton").addEventListener("click",async()=>{
+$("logoutButton").addEventListener("click",async () => {
   const {error} = await db.auth.signOut();
   if (error) showMessage($("globalMessage"),error.message,"error");
   else showLogin();
 });
 
-$("refreshButton").addEventListener("click",async()=>{
+$("refreshButton").addEventListener("click",async () => {
   showMessage($("globalMessage"),"Refreshing dashboard...","info");
   await refreshDashboard();
-  showMessage($("globalMessage"),"Refresh completed. Check for warnings on the page.","ok");
+  showMessage($("globalMessage"),"Refresh completed.","ok");
 });
 
-db.auth.onAuthStateChange((event,session)=>{
+db.auth.onAuthStateChange((event,session) => {
   if (session) {
     $("loginPanel").classList.add("hidden");
     $("appPanel").classList.remove("hidden");
@@ -706,7 +767,7 @@ db.auth.onAuthStateChange((event,session)=>{
   }
 });
 
-(async function startApp(){
+(async function startApp() {
   try {
     const {data,error} = await db.auth.getSession();
     if (error) throw error;
@@ -714,8 +775,8 @@ db.auth.onAuthStateChange((event,session)=>{
     else showLogin();
   } catch (error) {
     showMessage($("loginMessage"),
-      "Could not connect to Supabase.\n" +
-      (error.message || String(error)),"error");
+      "Could not connect to Supabase. " + (error.message || String(error)),
+      "error");
   }
 })();
 </script>
